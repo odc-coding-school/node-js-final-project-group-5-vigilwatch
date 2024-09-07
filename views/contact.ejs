@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Contact Us - VigilWatch</title>
+		<title>Contact Us - HubWatch</title>
 
 		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body class="bg-gray-100 min-h-screen flex flex-col">
-<!-- Header -->
+		<!-- Header -->
 		<%- include('includes/header') %>
 		<!-- header end -->
 		<header class="py-4">
@@ -17,7 +17,6 @@
 			</div>
 		</header>
 
-	
 		<main class="flex-grow">
 			<div class="container mx-auto px-4 py-12">
 				<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
@@ -28,14 +27,13 @@
 						If you have any questions or need assistance, feel free to reach out
 						to us using the form below or via email at
 						<a
-							href="mailto:support@vigilwatch.com"
+							href="mailto:hubwatch231@gmail.com"
 							class="text-blue-600 hover:underline"
-							>support@hubwatch.com</a
+							>hubwatch231@gmail.com</a
 						>.
 					</p>
 
-				
-					<form>
+					<form action="/send-message" method="POST">
 						<div class="mb-4">
 							<label for="name" class="block text-gray-700">Your Name</label>
 							<input
