@@ -10,11 +10,17 @@
 export default {
 	content: [
 		"./views/**/*.ejs", // Include all EJS files in the views folder
-		"./public/**/*.js",
-		"./src/css/**/*.css", // Include any JS files in the public folder (optional)
+		"./public/**/*.js",// Include any JS files in the public folder (optional)
+		"./src/css/**/*.css", 
 	],
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				darkblue: "#0b0b68",
+				customgray:"#969191"
+			},
+			
+		},
 	},
 	plugins: [],
 };
