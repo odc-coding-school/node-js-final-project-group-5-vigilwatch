@@ -2,9 +2,12 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const path = require("path");
+const db = require('./database.js');
 const app = express();
 const PORT = 3000;
 require("dotenv").config();
+
+
 
 //middle wires
 app.use(bodyParser.urlencoded({ extended: false }));
