@@ -24,10 +24,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"multer": "^1.4.5-lts.1",
 		"mysql": "^2.18.1",
-<<<<<<< HEAD
-=======
 		"nodemailer": "^6.9.15",
->>>>>>> fedd978734d25c6c1587f8e6953e766001afcea0
 		"nodemon": "^3.1.4"
 	},
 	"devDependencies": {

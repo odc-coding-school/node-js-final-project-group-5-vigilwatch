@@ -2,17 +2,14 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const path = require("path");
-const db = require('./database.js');
+const db = require("./database.js");
 const app = express();
-const PORT = 3000;
+const PORT = 8001;
 require("dotenv").config();
-
-
 
 //middle wires
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -22,11 +19,11 @@ app.set("view engine", "ejs");
 //imported routes
 const homeRoutes = require("./routes/homeRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-const chatRoutes = require('./routes/chat-route')
+const chatRoutes = require("./routes/chat-route");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
-app.use('/chat', chatRoutes)
+app.use("/chat", chatRoutes);
 
 // Define success and error routes here
 app.get("/success", (req, res) => {
@@ -34,12 +31,10 @@ app.get("/success", (req, res) => {
 	res.render("successEmail", { msg });
 });
 
-<<<<<<< HEAD
 app.get("/report", (req, res) => {
 	res.render("report.ejs");
 });
 
-=======
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
 	res.render("errorEmail", { msg });
@@ -82,15 +77,14 @@ app.post("/send-message", (req, res) => {
 	});
 });
 
-app.get('/register', (req, res)=>{
-	res.render('register')
-})
+app.get("/register", (req, res) => {
+	res.render("register");
+});
 
-app.get('/login', (req, res)=>{
-	res.render('login')
-})
+app.get("/login", (req, res) => {
+	res.render("login");
+});
 
->>>>>>> fedd978734d25c6c1587f8e6953e766001afcea0
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 });
