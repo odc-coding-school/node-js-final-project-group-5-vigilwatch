@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const db = require("./database.js");
 const app = express();
-const PORT = 8001;
+const PORT = 5000;
 require("dotenv").config();
 
 //middle wires
