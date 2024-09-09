@@ -10,6 +10,10 @@ app.get("/", (req, res) => {
 	res.render("home.ejs");
 });
 
+app.get("/report", (req, res) => {
+	res.render("report.ejs");
+});
+
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 });
