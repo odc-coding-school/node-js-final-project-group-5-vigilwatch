@@ -9,7 +9,6 @@ const db = mysql2.createConnection({
 })
 
 
-
 db.connect(function(err){
     if(err) return console.log(err.message);
     db.query("CREATE DATABASE IF NOT EXISTS hubwatch", function(err) {
