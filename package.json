@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev:css": "npx tailwindcss -i ./src/css/styles.css -o ./public/css/styles.css --watch",
-		"dev": "concurrently \"npm run dev:css\" \"nodemon index.js\""
+		"dev": "concurrently \"npm run dev:css\" \"nodemon index.js\"",
+		"start": "nodemon index.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -15,12 +16,18 @@
 		"bcrypt": "^5.1.1",
 		"body-parser": "^1.20.2",
 		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.5",
 		"ejs": "^3.1.10",
 		"express": "^4.19.2",
 		"express-session": "^1.18.0",
 		"jsonwebtoken": "^9.0.2",
 		"multer": "^1.4.5-lts.1",
 		"mysql": "^2.18.1",
+<<<<<<< HEAD
+=======
+		"nodemailer": "^6.9.15",
+>>>>>>> fedd978734d25c6c1587f8e6953e766001afcea0
 		"nodemon": "^3.1.4"
 	},
 	"devDependencies": {
