@@ -17,7 +17,8 @@ export default {
 		extend: {
 			colors: {
 				darkblue: "#0b0b68",
-				customgray:"#969191"
+				customgray:"#969191",
+				customblue: "#1877f2"
 			},
 			
 		},

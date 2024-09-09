@@ -6,19 +6,24 @@ const app = express();
 const PORT = 3000;
 require("dotenv").config();
 
+//middle wires
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+//imported routes
 const homeRoutes = require("./routes/homeRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const chatRoutes = require('./routes/chat-route')
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
+app.use('/chat', chatRoutes)
 
 // Define success and error routes here
 app.get("/success", (req, res) => {
