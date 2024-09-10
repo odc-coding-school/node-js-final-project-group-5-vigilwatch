@@ -3,8 +3,8 @@ const mysql2 = require('mysql2');
 
 const db = mysql2.createConnection({
     host: "localhost",
-    user: "root",
-    password: "1234",
+    user: "project",
+    password: "12345",
     database: "hubwatch"
 })
 
@@ -15,8 +15,18 @@ db.connect(function(err){
         if(err) return console.log(err.message);
         return console.log('database is created successfully');
     })
-    return console.log('database connected');
+     console.log('database connected');
+
+    let query = 'SHOW DATABASES';
+
+    db.query(query, (err, result)=>{
+        if(err) return console.log(err.message);
+        console.log(result);
+        
+    })
+
 })
+
 
 
 
