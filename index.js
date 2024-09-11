@@ -2,10 +2,13 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const path = require("path");
-const db = require("./database.js");
+// const db = require("./database.js");
 const app = express();
 const PORT = 5000;
 require("dotenv").config();
+
+
+
 
 //middle wires
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,9 +24,12 @@ const homeRoutes = require("./routes/homeRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const chatRoutes = require("./routes/chat-route");
 
+
+
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
 app.use("/chat", chatRoutes);
+
 
 // Define success and error routes here
 app.get("/success", (req, res) => {
