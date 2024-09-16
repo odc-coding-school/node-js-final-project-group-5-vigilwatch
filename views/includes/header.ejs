@@ -1,14 +1,56 @@
 <header class="bg-red-700 py-6 shadow-md sticky top-0 z-10">
-	<div class="container mx-auto px-4 flex justify-between items-center">
-		<h1 class="text-3xl font-bold text-white">HubWatch</h1>
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-white">HubWatch</h1>
 
-		<nav>
-			<ul class="flex space-x-6 text-white">
-				<li><a href="/" class="hover:underline">Home</a></li>
-				<li><a href="/report" class="hover:underline">Report Incident</a></li>
-				<li><a href="/analytics" class="hover:underline">Analytics</a></li>
-				<li><a href="/login" class="hover:underline">Login</a></li>
-			</ul>
-		</nav>
-	</div>
+        <nav>
+            <ul class="flex space-x-6 text-white items-center">
+                <li><a href="/" class="hover:underline">Home</a></li>
+                <li><a href="/report" class="hover:underline">Report Incident</a></li>
+                <li><a href="/analytics" class="hover:underline">Analytics</a></li>
+
+                <% if (isRegistered) { %>
+                <li class="relative">
+
+                    <button id="profile-menu-btn" class="flex items-center focus:outline-none">
+                        <img src="<%= user && user.profilePic ? user.profilePic : '/user-solid.svg' %>" alt="Profile" class="w-10 h-10 rounded-full">
+                    </button>
+                    
+                    <div id="profile-menu" class="absolute right-0 mt-2 w-48 bg-red-600 rounded-lg shadow-lg hidden z-20">
+                        <h1 class="px-4 py-2 text-white">Welcome <%= user && user.name %></h1>
+                        <ul class="py-1">
+                            <li>
+                                <form action="/user/upload-profile" method="POST" enctype="multipart/form-data" class="px-4 py-2">
+                                    <input type="file" name="profilePic" accept="image/*" class="mb-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
+                                    <button type="submit" class="block w-full text-left text-white bg-red-700 hover:bg-red-800">Upload Profile</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="/logout" method="POST" class="block px-4 py-2">
+                                    <button type="submit" class="w-full text-left text-white bg-red-700 hover:bg-red-800">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <% } else { %>
+                <li><a href="/login" class="hover:underline">Login</a></li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
 </header>
+
+<script>
+    document.getElementById('profile-menu-btn').addEventListener('click', function () {
+        const profileMenu = document.getElementById('profile-menu');
+        profileMenu.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function (e) {
+        const profileMenu = document.getElementById('profile-menu');
+        const profileBtn = document.getElementById('profile-menu-btn');
+        if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.classList.add('hidden');
+        }
+        
+    });
+</script>
