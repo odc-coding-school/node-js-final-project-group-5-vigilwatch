@@ -8,7 +8,39 @@ const db = mysql2.createConnection({
 	database: process.env.DB_NAME,
 });
 
-const mysql = require("mysql2");
+
+
+db.connect(function (err) {
+	if (err) return console.log(err.message);
+	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database `, function (err) {
+		if (err) return console.log(err.message);
+		return console.log("database is created successfully");
+	});
+	console.log("database connected");
+});
+
+
+db.query(`CREATE TABLE IF NOT EXISTS location (
+	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`, (err, result)=>{
+		console.log("Location Table created successfully");
+		
+})
+
+
+db.query(`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
+	 (DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
+	 (DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
+	 (DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
+	 (DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
+	 (DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
+	 	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
+
+	`, (err, result)=>{
+		if(err) return console.log(err.message);
+		
+		console.log("Insert into the location table successful");
+		
+})
 
 const createTables = () => {
 	const createUsersTable = `
@@ -21,7 +53,7 @@ const createTables = () => {
 			profilePic VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        );
+        )
     `;
 
 	// run the queries
@@ -35,13 +67,7 @@ const createTables = () => {
 };
 
 createTables();
-db.connect(function (err) {
-	if (err) return console.log(err.message);
-	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database `, function (err) {
-		if (err) return console.log(err.message);
-		return console.log("database is created successfully");
-	});
-	console.log("database connected");
-});
+
+
 
 module.exports = db;

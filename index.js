@@ -40,6 +40,7 @@ const chatRoutes = require("./routes/chat-route");
 const userRoutes = require("./routes/userRoutes");
 const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const locationRoutes = require("./routes/location.js");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
@@ -47,6 +48,7 @@ app.use("/chat", chatRoutes);
 app.use("/user", userRoutes);
 app.use("/success", successRoutes);
 app.use("/report", reportRoutes);
+app.use("/location", locationRoutes);
 
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";

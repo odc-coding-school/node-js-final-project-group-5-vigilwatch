@@ -1,1 +1,1 @@
-GET http://localhost:5000/chat
+GET http://localhost:5000/location
