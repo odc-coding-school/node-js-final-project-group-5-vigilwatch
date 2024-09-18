@@ -56,6 +56,7 @@ const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const locationRoutes = require("./routes/location.js");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const { group } = require("console");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
