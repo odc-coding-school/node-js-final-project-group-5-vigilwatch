@@ -80,6 +80,9 @@ router.get("/", async (req, res) => {
 			.promise()
 			.query(specificIncidentsQuery);
 
+		console.log(incidentsByLocation);
+		console.log(specificIncidents);
+
 		res.render("analytics", { user, incidentsByLocation, specificIncidents });
 	} catch (err) {
 		console.error("Error fetching data for analytics page: ", err);

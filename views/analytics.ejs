@@ -11,32 +11,30 @@
 		<!-- Header -->
 		<%- include('includes/header') %>
 		<!-- header end -->
+		<header class="text-black p-4 text-center font-bold text-xl">
+			Hubwatch - Incident Analytics Dashboard
+		</header>
 
 		<section class="p-8">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				<div class="bg-white p-6 rounded-lg shadow-lg">
-					<h3 class="text-xl font-bold mb-4">
+					<h2 class="text-xl font-bold mb-4">
 						Number of Incidents per Location
-					</h3>
+					</h2>
 					<canvas id="incidentsPerLocationChart"></canvas>
 				</div>
 
 				<div class="bg-white p-6 rounded-lg shadow-lg">
-					<h3 class="text-xl font-bold mb-4">
+					<h2 class="text-xl font-bold mb-4">
 						Specific Incidents per Location
-					</h3>
+					</h2>
 					<canvas id="specificIncidentsPerLocationChart"></canvas>
 				</div>
 			</div>
-			<div class="container mx-auto px-4">
-				<h2 class="text-3xl font-bold text-center mb-12">Incident Analytics</h2>
-
-				<div>
-					<h3 class="text-xl font-bold mb-6">
-						Incident Trends Across Locations
-					</h3>
-					<canvas id="incidentTrendsChart"></canvas>
-				</div>
+			<!-- <h2 class="text-3xl font-bold text-center mb-12">Incident Analytics</h2> -->
+			<div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+				<h2 class="text-xl font-bold mb-4">Incident Trends Across Locations</h2>
+				<canvas id="incidentTrendsChart"></canvas>
 			</div>
 		</section>
 
