@@ -1,1 +1,28 @@
-GET http://localhost:5000/location
+GET http://localhost:5000/members
+
+###
+
+ POST http://localhost:5000/logout
+
+
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+
+{
+    "email": "hawakromah@gmail.com",
+    "password": "hawa"
+}
+
+###
+POST http://localhost:5000/register
+Content-Type: application/json
+
+
+{
+    "full_name": "S. Abraham kanneh",
+    "email": "abrahamkanneh@gmail.com",
+    "address": "Duala",
+    "password": "abraham"
+}

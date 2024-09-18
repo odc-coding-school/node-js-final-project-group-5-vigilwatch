@@ -46,13 +46,15 @@ const createTables = () => {
 	const createUsersTable = `
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100),
+            full_name VARCHAR(100),
             email VARCHAR(100) UNIQUE,
             password VARCHAR(255),
-            address VARCHAR(255),
+            user_address VARCHAR(255),
+			room_id INT, 
 			profilePic VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			FOREIGN KEY(room_id) REFERENCES room(room_id)
         )
     `;
 
