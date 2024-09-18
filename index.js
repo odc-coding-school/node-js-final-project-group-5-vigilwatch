@@ -13,6 +13,7 @@ require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
@@ -26,6 +27,7 @@ app.use(
 		cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 	})
 );
+
 
 // Create a new session object with the user ID and secret key stored in the session object and save it to the session store.
 app.use((req, res, next) => {
@@ -41,6 +43,7 @@ const userRoutes = require("./routes/userRoutes");
 const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const locationRoutes = require("./routes/location.js");
+const { group } = require("console");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
@@ -102,9 +105,11 @@ app.get("/login", (req, res) => {
 
 // Register Route
 app.post("/register", async (req, res) => {
-	const { name, email, address, password } = req.body;
+	const { full_name, email, address, password } = req.body;
+	const hashedPassword = await bcrypt.hash(password, 10);
 
 	try {
+		//checke if email exist in the user table
 		db.query(
 			"SELECT * FROM users WHERE email = ?",
 			[email],
@@ -113,17 +118,44 @@ app.post("/register", async (req, res) => {
 					return res.status(400).json({ message: "User already exists" });
 				}
 
-				const hashedPassword = await bcrypt.hash(password, 10);
-				db.query(
-					"INSERT INTO users (name, email, address, password, createdAt, updatedAt) VALUES (?, ?, ?, ?, NOW(), NOW())",
-					[name, email, address, hashedPassword],
-					(error, results) => {
-						if (error) return res.status(500).json({ error });
+				//check if location exist in room table
+				const query = "SELECT * FROM room WHERE address =?";
+				db.query(query, [address], (err, result) => {
+					if (err) return res.json(err.message);
+					const query = `INSERT INTO users 
+						(full_name, email, password, user_address, room_id) VALUES(?,?,?,?,?)
+					`;
+					
+					//assigning the exist room id to the user.room_id
+					let roomID;
 
-						req.session.user = { id: results.insertId, email };
-						res.redirect("/login");
+					if (result.length !== 0) {
+						roomID = result[0].room_id;
+						db.query(query, [full_name, email, hashedPassword, address, roomID], (err, result) => {
+							if (err) return res.json(err.message);
+							res.redirect("/login");
+						})
 					}
-				);
+					else {
+						const query = "INSERT INTO room(address) VALUES(?)";
+						db.query(query, [address], (err, result) => {
+							if (err) return res.json(err.message);
+							//assigning the inserted room id to the user.room_id
+							roomID = result.insertId;
+
+							//inserting into the user table if the room address do not exist
+							const query = "INSERT INTO users (full_name, email, password, user_address, room_id) VALUES(?,?,?,?,?)"
+							db.query(query, [full_name, email, hashedPassword, address, roomID], (err, result) => {
+								if (err) return res.json(err.message);
+								res.redirect("/login");
+							})
+						})
+
+					}
+
+
+				})
+
 			}
 		);
 	} catch (err) {
@@ -153,13 +185,17 @@ app.post("/login", async (req, res) => {
 
 				// Checking if user is registered
 				req.session.isRegistered = true;
+				// console.log(req.session.user = user);
+
 				req.session.user = {
 					id: user.id,
 					name: user.name,
 					email: user.email,
 					address: user.address,
+					room_id: user.room_id,
 					profilePic: user.profilePic,
 				};
+
 
 				res.redirect("/");
 			}
@@ -168,6 +204,7 @@ app.post("/login", async (req, res) => {
 		res.status(500).json({ error: "Login failed" });
 	}
 });
+
 
 // Logout Route
 app.post("/logout", (req, res) => {

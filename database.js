@@ -9,7 +9,6 @@ const db = mysql2.createConnection({
 });
 
 
-
 db.connect(function (err) {
 	if (err) return console.log(err.message);
 	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database `, function (err) {
@@ -20,41 +19,59 @@ db.connect(function (err) {
 });
 
 
-db.query(`CREATE TABLE IF NOT EXISTS location (
-	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`, (err, result)=>{
-		console.log("Location Table created successfully");
-		
-})
+// db.query(`CREATE TABLE IF NOT EXISTS location (
+// 	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`, (err)=>{
+// 	console.log("Location Table created successfully");	
+// })
 
 
-db.query(`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
-	 (DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
-	 (DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
-	 (DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
-	 (DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
-	 (DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
-	 	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
+// db.query(`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
+// 	 (DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
+// 	 (DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
+// 	 (DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
+// 	 (DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
+// 	 (DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
+// 	 	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
 
-	`, (err, result)=>{
-		if(err) return console.log(err.message);
-		
-		console.log("Insert into the location table successful");
-		
-})
+// 	`, (err, result)=>{
+// 		if(err) return console.log(err.message);
+
+// 		console.log("Insert into the location table successful");
+
+// })
 
 const createTables = () => {
 	const createUsersTable = `
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100),
+            full_name VARCHAR(100),
             email VARCHAR(100) UNIQUE,
             password VARCHAR(255),
-            address VARCHAR(255),
+            user_address VARCHAR(255),
+			room_id INT, 
 			profilePic VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+			updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			FOREIGN KEY(room_id) REFERENCES room(room_id)
         )
     `;
+
+
+	const createGroupTable = `
+		CREATE TABLE IF NOT EXISTS room 
+			(room_id INT AUTO_INCREMENT PRIMARY KEY, address VARCHAR(255),
+			createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+		`;
+
+
+	// run the queries
+	db.query(createGroupTable, (error, result) => {
+		if (error) {
+			console.error("Error creating users table: ", error);
+		} else {
+			console.log("Room table created or already exists");
+		}
+	});
 
 	// run the queries
 	db.query(createUsersTable, (error, result) => {
@@ -64,6 +81,8 @@ const createTables = () => {
 			console.log("Users table created or already exists");
 		}
 	});
+
+
 };
 
 createTables();
