@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Incident Analytics</title>
+		<link rel="stylesheet" href="css/styles.css" />
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body>
+		<!-- Header -->
+		<%- include('includes/header') %>
+		<!-- header end -->
+
+		<section class="p-8">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				<div class="bg-white p-6 rounded-lg shadow-lg">
+					<h3 class="text-xl font-bold mb-4">
+						Number of Incidents per Location
+					</h3>
+					<canvas id="incidentsPerLocationChart"></canvas>
+				</div>
+
+				<div class="bg-white p-6 rounded-lg shadow-lg">
+					<h3 class="text-xl font-bold mb-4">
+						Specific Incidents per Location
+					</h3>
+					<canvas id="specificIncidentsPerLocationChart"></canvas>
+				</div>
+			</div>
+			<div class="container mx-auto px-4">
+				<h2 class="text-3xl font-bold text-center mb-12">Incident Analytics</h2>
+
+				<div>
+					<h3 class="text-xl font-bold mb-6">
+						Incident Trends Across Locations
+					</h3>
+					<canvas id="incidentTrendsChart"></canvas>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<%- include('includes/footer') %>
+		<!-- Footer End -->
+		<script src="../scripts/analytics.js"></script>
+	</body>
+</html>

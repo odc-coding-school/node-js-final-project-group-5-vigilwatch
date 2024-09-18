@@ -3,10 +3,12 @@ const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const path = require("path");
 const db = require("./database.js");
+const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const app = express();
+
 const PORT = 5000;
 require("dotenv").config();
 
@@ -27,6 +29,18 @@ app.use(
 	})
 );
 
+// Multer for handling image uploads
+const storage = multer.diskStorage({
+	destination: "./public/uploads/",
+	filename: (req, file, cb) => {
+		cb(
+			null,
+			file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+		);
+	},
+});
+const upload = multer({ storage: storage }).single("imageUpload");
+
 // Create a new session object with the user ID and secret key stored in the session object and save it to the session store.
 app.use((req, res, next) => {
 	res.locals.isRegistered = req.session.isRegistered;
@@ -41,6 +55,7 @@ const userRoutes = require("./routes/userRoutes");
 const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const locationRoutes = require("./routes/location.js");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
@@ -49,12 +64,39 @@ app.use("/user", userRoutes);
 app.use("/success", successRoutes);
 app.use("/report", reportRoutes);
 app.use("/location", locationRoutes);
+app.use("/analytics", analyticsRoutes);
 
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
 	res.render("errorEmail", { msg });
 });
 
+// Handle form submission
+app.post("/submit-incident", (req, res) => {
+	upload(req, res, (err) => {
+		if (err) {
+			res.send("Error uploading file");
+		} else {
+			const { incidentType, description, incidentDate, location } = req.body;
+			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+			const incidentsInsert =
+				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
+			const values = [
+				incidentType,
+				description,
+				incidentDate,
+				location,
+				imagePath,
+			];
+
+			db.query(incidentsInsert, values, (err, result) => {
+				if (err) throw err;
+				res.send("Incident reported successfully");
+			});
+		}
+	});
+});
 // Send email
 app.post("/send-message", (req, res) => {
 	const { name, email, message } = req.body;
@@ -179,3 +221,5 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Multer configuration for image uploads
