@@ -56,6 +56,9 @@ const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const locationRoutes = require("./routes/location.js");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const newsRoutes = require("./routes/newsRoutes");
+const policyRoutes = require("./routes/policyRoutes");
+const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
 const { group } = require("console");
 
 app.use("/", homeRoutes);
@@ -66,6 +69,9 @@ app.use("/success", successRoutes);
 app.use("/report", reportRoutes);
 app.use("/location", locationRoutes);
 app.use("/analytics", analyticsRoutes);
+app.use("/news", newsRoutes);
+app.use("/policy", policyRoutes);
+app.use("/termsOfService", termsOfServiceRoutes);
 
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
@@ -258,5 +264,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
 });
-
-// Multer configuration for image uploads
