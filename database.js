@@ -25,22 +25,22 @@ db.query(
 	}
 );
 
-db.query(
-	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
-	(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
-	(DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
-	(DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
-	(DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
-	(DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
-	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
+// db.query(
+// 	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
+// 	(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
+// 	(DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
+// 	(DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
+// 	(DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
+// 	(DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
+// 	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
 
-	`,
-	(err, result) => {
-		if (err) return console.log(err.message);
+// 	`,
+// 	(err, result) => {
+// 		if (err) return console.log(err.message);
 
-		console.log("Insert into the location table successful");
-	}
-);
+// 		console.log("Insert into the location table successful");
+// 	}
+// );
 
 const createTables = () => {
 	const createUsersTable = `
