@@ -8,6 +8,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const setupSocketIO = require("./routes/socketIo-route.js");
+const {formatDistanceToNow, previousDay} = require("date-fns");
+
+
+
+
 const app = express();
 
 const PORT = 5000;
@@ -284,33 +289,51 @@ app.get('/chat', (req, res) => {
     	socket.on("join-room", (roomID) => {
     		socket.join(roomID);
 
-    		io.to(roomID).emit("join-room", roomID);
+    	
+
+			//fetching previous message
+			const query = `
+				SELECT u.id, u.full_name, u.email, u.room_id,
+				 	u.profilePic As user_profile, m.message_id,
+                    m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
+					messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
+				`;
+
+			db.query(query, [roomID], (err, PreviousMessage)=>{
+				if(err) throw err;
+				//variable to hold the previous message
+				let existingMessage = {message:[]};
+
+				
+				//iterating over the previousmessage array return from the database
+				PreviousMessage.forEach((prevMessage)=>{
+
+					//formating the date to time ago using data-fns
+					const messagedTime = new Date(prevMessage.messaged_time);
+					const timeAgo = formatDistanceToNow(messagedTime, {
+						addSuffix: true
+					})
+					console.log(timeAgo);
+					
+
+					existingMessage.message.push({
+						email: prevMessage.email,
+						fullName: prevMessage.full_name,
+						id: prevMessage.id,
+						messageType: prevMessage.message_type,
+						messageTime: timeAgo,
+						roomId: prevMessage.room_id,
+						userId: prevMessage.user_id,
+						profile: prevMessage.user_profile
+					})
+				})
+				
+				socket.emit("previous-message", existingMessage);
+	
+			})
 			
     	})
 
-		//fetching previous message
-		const query = "SELECT * FROM messages WHERE room_id = ?";
-		db.query(query, [roomID], (err, PreviousMessage)=>{
-			if(err) throw err;
-
-			//query to attach the user profile to the previous message base on the id
-			const query = `SELECT users.id, users.profilePic, 
-			users.user_address FROM users WHERE id = ?`;
-			db.query(query, [userID], (err, userprofile)=>{
-				if(err) throw err
-
-				//getting the messsage time from the messages table
-				const query = "SELECT messages.messaged_time FROM messages";
-				db.query(query, (err, time)=>{
-					if(err) res.json(err.message)
-						console.log(time)
-				})
-
-
-				socket.emit("previous-message", {PreviousMessage, userprofile});
-			})
-
-		})
 
 
     	//sending the messages to the all members
@@ -325,8 +348,9 @@ app.get('/chat', (req, res) => {
     			const query = `SELECT users.id, users.profilePic, 
     			users.user_address FROM users WHERE id = ?`;
     			db.query(query, [userID], (err, userProfile)=>{
-    				if(err) throw err
-
+    				if(err) throw err;
+					
+					
     				io.to(roomID).emit("new-message", ({userID, roomID, sendmessage, userProfile}))
     			})
 

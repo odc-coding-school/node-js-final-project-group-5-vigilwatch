@@ -17,13 +17,13 @@ db.connect(function (err) {
 	console.log("database connected");
 });
 
-db.query(
-	`CREATE TABLE IF NOT EXISTS location (
-	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`,
-	(err, result) => {
-		console.log("Location Table created successfully");
-	}
-);
+// db.query(
+// 	`CREATE TABLE IF NOT EXISTS location (
+// 	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`,
+// 	(err, result) => {
+// 		console.log("Location Table created successfully");
+// 	}
+// );
 
 // db.query(
 // 	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
@@ -70,6 +70,13 @@ const createTables = () => {
 		);
 `;
 
+const message_table = `
+	CREATE TABLE IF NOT EXISTS messages
+		(message_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, room_id INT, 
+		message_type VARCHAR(255), messaged_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (room_id) REFERENCES room(room_id))
+	`
+
 	db.query(createIncidentsTable, (error, result) => {
 		if (error) {
 			console.error("Error creating incidents table: ");
@@ -79,13 +86,24 @@ const createTables = () => {
 	});
 
 	// run the queries
-	db.query(createUsersTable, (error, result) => {
+	// db.query(createUsersTable, (error, result) => {
+	// 	if (error) {
+	// 		console.error("Error creating users table: ", error);
+	// 	} else {
+	// 		console.log("Users table created or already exists");
+	// 	}
+	// });
+
+	// run the message queries
+	db.query(message_table, (error, result) => {
 		if (error) {
 			console.error("Error creating users table: ", error);
 		} else {
-			console.log("Users table created or already exists");
+			console.log("message table created or already exists");
 		}
 	});
+
+
 };
 
 createTables();

@@ -1,9 +1,9 @@
 
-
 //Selecting the Elements
 const ChatRooom = document.querySelector('.chat-room');
 const chatMessageHolder = document.querySelector('.chat-message-holder');
 const groupMember = document.querySelector('.group-members');
+const chatMessagesWrapper = document.querySelector('.chat-message');
 let messageInput = document.querySelector('.input-field');
 
 
@@ -74,18 +74,31 @@ const socket = io();
 //join the group buy the group id
 socket.emit("join-room", roomID);
 
-//checking if the user join the group
-socket.on("join-room", (roomID) => {
-    console.log(`user as joined the group with id${roomID}`);
-})
-
 //previous messages display to all user in group
-socket.on("previous-message", async (previouMessage, userProfile) => {
+socket.on("previous-message", (previouMessage) => {
+    
+    previouMessage.message.map((prevMessage)=>{
+        const newMessageWrapper = document.createElement("div");
 
-    console.log(previouMessage,userProfile);
+        newMessageWrapper.innerHTML = `
+         <div class="message-top flex flex-col" id=${prevMessage.id}>
+                    <div class="flex items-end">
+                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
+                        <span
+                            class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}?</span>
+                    </div>
+                    <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
+                </div>
+        `
+    
+        chatMessageHolder.appendChild(newMessageWrapper)
+        console.log(prevMessage);
+        
+    })
+
+    chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight;
 
 })
-
 
 
 
@@ -105,31 +118,33 @@ function sendMessage() {
 
 
     socket.on("new-message", (newMessage) => {
-        const newMessageWrapper = document.createElement("section");
-
-        newMessageWrapper.innerHTML = `
-         <div class="message-top flex flex-col" id=${newMessage.userID}>
-                    <div class="flex items-end">
-                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userProfile[0].profilePic} alt="profile-image">
-                        <span
-                            class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${newMessage.sendmessage}?</span>
-                    </div>
-                    <div class="timestamp text-gray-400">1 hour ago</div>
-                </div>
-        `
-
-
-        chatMessageHolder.appendChild(newMessageWrapper)
-
-        console.log(newMessage);
-
-        chatMessageHolder.scrollTo= chatMessageHolder.scrollHeight;
+        displayMessage(newMessage)
 
     })
 
 
+}
+
+
+// displaying message to the dom
+function displayMessage(message) {
+    const newMessageWrapper = document.createElement("div");
+
+    newMessageWrapper.innerHTML = `
+     <div class="message-top flex flex-col" id=${message.userID}>
+                <div class="flex items-end">
+                    <img class="w-10 h-10 rounded-full object-cover mr-3" src=${message.userProfile[0].profilePic} alt="profile-image">
+                    <span
+                        class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${message.sendmessage}?</span>
+                </di
+            </div>
+    `
+
+    chatMessageHolder.appendChild(newMessageWrapper)
 
 }
+
+
 
 
 
