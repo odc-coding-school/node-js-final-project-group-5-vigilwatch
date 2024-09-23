@@ -4,7 +4,8 @@ const ChatRooom = document.querySelector('.chat-room');
 const chatMessageHolder = document.querySelector('.chat-message-holder');
 const groupMember = document.querySelector('.group-members');
 const chatMessagesWrapper = document.querySelector('.chat-message');
-let messageInput = document.querySelector('.input-field');
+let messageInput = document.getElementById('input-field');
+let form = document.getElementById('form');
 
 
 //Url fetching group or room members
@@ -76,78 +77,113 @@ socket.emit("join-room", roomID);
 
 //previous messages display to all user in group
 socket.on("previous-message", (previouMessage) => {
-    
-    previouMessage.message.map((prevMessage)=>{
+
+    previouMessage.message.map((prevMessage) => {
         const newMessageWrapper = document.createElement("div");
 
-        newMessageWrapper.innerHTML = `
-         <div class="message-top flex flex-col" id=${prevMessage.id}>
-                    <div class="flex items-end">
-                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
-                        <span
-                            class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}?</span>
+        //adding the blue and gray background on the chat base on the id
+        if (prevMessage.id === userID) {
+            newMessageWrapper.innerHTML = `
+             <div class="message-top flex flex-col align-right" id=${prevMessage.id}>
+                        <div class="flex items-end">
+                            <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
+                            <span
+                                class="current-user-bg message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}</span>
+                        </div>
+                        <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
                     </div>
-                    <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
-                </div>
-        `
-    
+            `
+
+        } else {
+            newMessageWrapper.innerHTML = `
+            <div class="message-top flex flex-col" id=${prevMessage.id}>
+                       <div class="flex items-end">
+                           <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
+                           <span
+                               class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72 members-bg">${prevMessage.messageType}</span>
+                       </div>
+                       <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
+                   </div>
+           `
+        }
         chatMessageHolder.appendChild(newMessageWrapper)
         console.log(prevMessage);
-        
+
+        chatMessagesWrapper.scrollTo = chatMessagesWrapper.scrollHeight - chatMessagesWrapper.clientHeight
+
     })
 
-    chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight;
+
+    window.scrollTo(0, document.body.scrollHeight)
+
+})
+
+form.addEventListener("submit", (e) => {
+    let textMessage = messageInput.value;
+
+    
+    e.preventDefault();
+
+    //sending the message
+    if (messageInput.value) {
+        socket.emit("send-message", {userID, roomID, message:messageInput.value});
+        messageInput.value = "";
+    }
+    messageInput.focus();
+ 
+})
+
+
+
+
+
+socket.on("new-message", function (newMessage) {
+    const newMessageWrapper = document.createElement("div");
+
+    console.log(newMessage);
+    
+    // //adding the blue and gray background on the chat base on the if new message id match logged in user id
+    if (newMessage.userId === userID) {
+        newMessageWrapper.innerHTML = `
+         <div class=" align-right message-top flex flex-col" id=${newMessage.userId}>
+                    <div class="flex items-end">
+                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userprofile} alt="profile-image">
+                        <span class="current-user message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72 current-user-bg">${newMessage.newMessage}</span>
+                    </di
+                </div>
+        `
+    } else {
+        newMessageWrapper.innerHTML = `
+        <div class="message-top flex flex-col" id=${newMessage.userId}>
+                   <div class="flex items-end">
+                       <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userprofile} alt="profile-image">
+                       <span
+                           class="members message text-sm md:text-lg bg-gray-200 text-black px-7 py-2 rounded-lg max-w-72 members-bg">${newMessage.newMessage}</span>
+                   </di
+               </div>
+       `
+    }
+
+    chatMessageHolder.appendChild(newMessageWrapper);
+
+    // textArea.scrollHeight + "px";
 
 })
 
 
 
-//sending the message
-function sendMessage() {
-    let message = messageInput.value;
-
-    if (message) {
-        socket.emit("send-message", userID, roomID, message);
-        messageInput.value = "";
-
-        console.log(userID, roomID, message);
-        
-    }
-
-    messageInput.focus();
-
-
-    socket.on("new-message", (newMessage) => {
-        displayMessage(newMessage)
-
-    })
-
+//resizing the text aras base on message size
+function resizeTextArea(textArea) {
+    textArea.style.height = 'auto';
+    textArea.style.height = textArea.scrollHeight + "px";
 
 }
-
-
-// displaying message to the dom
-function displayMessage(message) {
-    const newMessageWrapper = document.createElement("div");
-
-    newMessageWrapper.innerHTML = `
-     <div class="message-top flex flex-col" id=${message.userID}>
-                <div class="flex items-end">
-                    <img class="w-10 h-10 rounded-full object-cover mr-3" src=${message.userProfile[0].profilePic} alt="profile-image">
-                    <span
-                        class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${message.sendmessage}?</span>
-                </di
-            </div>
-    `
-
-    chatMessageHolder.appendChild(newMessageWrapper)
-
-}
+messageInput.addEventListener("input", ()=>{
+    resizeTextArea(messageInput)
+})
 
 
 
-
-
-
-
-
+document.addEventListener("DOMContentLoaded", ()=>{
+    resizeTextArea(messageInput)
+})

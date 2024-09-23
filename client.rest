@@ -1,4 +1,9 @@
-GET http://localhost:5000/api/loginuser
+GET http://localhost:5000/api/news
+
+
+###
+GET http://localhost:5000/news/i
+
 
 ###
 
