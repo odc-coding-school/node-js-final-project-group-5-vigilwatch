@@ -8,8 +8,6 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-console.log(process.env.USER_EMAIL, process.env.PASSWORD);
-
 const sendNotification = async ({
 	location,
 	description,

@@ -63,10 +63,8 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const policyRoutes = require("./routes/policyRoutes");
 const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
-const incidentSuccessRoutes = require("./routes/IncidentSuccessRoutes");
-const { group } = require("console");
-const loginUserRoute = require("./routes/login-user-route.js");
 const loginUserRoute = require("./routes/api.js");
+const incidentSuccessRoutes = require("./routes/incidentSuccessRoutes");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
@@ -180,18 +178,6 @@ app.post("/send-message", (req, res) => {
 		res.redirect(
 			"/success?msg=Your message has been sent! We'll get back to you shortly."
 		);
-	});
-});
-
-// get reported incident
-
-app.get("/get-reported-incidents", (req, res) => {
-	const getIncidentsQuery =
-		"SELECT location, description, incident_date, incident_type, image_path FROM incidents ORDER BY created_at DESC";
-
-	db.query(getIncidentsQuery, (err, results) => {
-		if (err) throw err;
-		res.json({ incidents: results });
 	});
 });
 
@@ -344,144 +330,79 @@ app.get("/chat", (req, res) => {
 	const roomID = req.session.user.room_id;
 	const userID = req.session.user.id;
 	const user = req.session.user || null;
-
-	res.render("chat", { user, isRegistered: !!req.session.user });
 	res.render("chat", { user, isRegistered: !!req.session.user });
 
+	// Handle socket connection inside the chat route
 	io.on("connection", (socket) => {
-		console.log(socket.id);
+		console.log(`User connected: ${socket.id}`);
 
-		io.on("connection", (socket) => {
-			console.log(socket.id);
+		// Join the group by the group ID
+		socket.on("join-room", (roomID) => {
+			socket.join(roomID);
+			console.log(`User ${socket.id} joined room ${roomID}`);
 
-			//join the group by the group ID
-			socket.on("join-room", (roomID) => {
-				socket.join(roomID);
-
-				//fetching previous message
-				// const query = `
-				// 	SELECT u.id, u.full_name, u.email, u.room_id,
-				// 	 	u.profilePic As user_profile, m.message_id,
-				//         m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
-				// 		messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
-				// 	`;
-
-				const query = `
-				SELECT u.id, u.full_name, u.email, u.room_id,
-					u.profilePic As user_profile, m.message_id,
-                    m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
-					messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
-				`;
-
-				db.query(query, [roomID], (err, PreviousMessage) => {
-					if (err) throw err;
-					//variable to hold the previous message
-					let existingMessage = { message: [] };
-
-					//iterating over the previousmessage array return from the database
-					PreviousMessage.forEach((prevMessage) => {
-						//iterating over the previousmessage array return from the database
-						PreviousMessage.forEach((prevMessage) => {
-							//formating the date to time ago using data-fns
-							const messagedTime = new Date(prevMessage.messaged_time);
-							const timeAgo = formatDistanceToNow(messagedTime, {
-								addSuffix: true,
-							});
-							console.log(timeAgo);
-
-							existingMessage.message.push({
-								email: prevMessage.email,
-								fullName: prevMessage.full_name,
-								id: prevMessage.id,
-								messageType: prevMessage.message_type,
-								messageTime: timeAgo,
-								roomId: prevMessage.room_id,
-								userId: prevMessage.user_id,
-								profile: prevMessage.user_profile,
-							});
-						});
-
-						socket.emit("previous-message", existingMessage);
-					});
-					profile: prevMessage.user_profile;
-				});
-			});
-
-			// socket.to(roomID).emit("previous-message", existingMessage);
-			socket.emit("previous-message", existingMessage);
-		});
-	});
-
-	//sending the messages to the all members
-	socket.on("send-message", (data) => {
-		const query =
-			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
-		db.query(query, [data.userID, data.roomID, data.message], (err, result) => {
-			if (err) return res.json(err.message);
-		});
-
-		//query to attach the user profilet to the previous message base on the id
-		const profileQuery = `SELECT users.id, users.profilePic, 
-			users.user_address FROM users WHERE id = ?`;
-		db.query(profileQuery, [data.userID], (err, userProfile) => {
-			if (err) throw err;
-
-			//sending message to all members in the group except the senders
-			// socket.to(roomID).emit("new-message", ({
-			// 	userId: data.userID,
-			// 	roomId: data.roomID,
-			// 	newMessage: data.message,
-			// 	userProfile: userProfile[0].profilePic
-			// }))
-
-			//sending message to only the senders
-			socket.broadcast.emit("new-message", {
-				userId: data.userID,
-				roomId: data.roomID,
-				newMessage: data.message,
-				userprofile: userProfile[0].profilePic,
-			});
-
-			// console.log({userid:data.userID, roomid:data.roomID,
-			// 	message:data.message, userprofile:userProfile});
-		});
-	});
-
-	//sending the messages to the all members
-	socket.on("send-message", (userID, roomID, sendmessage) => {
-		// console.log(userID, groupID, sendmessage);
-
-		const query =
-			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
-		db.query(query, [userID, roomID, sendmessage], (err, result) => {
-			if (err) return res.json(err.message);
-
-			//query to attach the user profilet to the previous message base on the id
-			const query = `SELECT users.id, users.profilePic, 
-    			users.user_address FROM users WHERE id = ?`;
-			db.query(query, [userID], (err, userProfile) => {
+			// Fetch previous messages
+			const query = `
+                SELECT u.id, u.full_name, u.email, u.room_id,
+                u.profilePic AS user_profile, m.message_id,
+                m.user_id, m.room_id, m.message_type, m.messaged_time
+                FROM users AS u
+                JOIN messages AS m ON (u.room_id = m.room_id)
+                WHERE m.room_id = ?;
+            `;
+			db.query(query, [roomID], (err, previousMessages) => {
 				if (err) throw err;
-				socket.on("disconnect", () => {
-					console.log(
-						`A user with ${userID} and group id ${roomID} has disconnected`
-					);
+
+				let existingMessages = { message: [] };
+				previousMessages.forEach((prevMessage) => {
+					const messagedTime = new Date(prevMessage.messaged_time);
+					const timeAgo = formatDistanceToNow(messagedTime, {
+						addSuffix: true,
+					});
+
+					existingMessages.message.push({
+						email: prevMessage.email,
+						fullName: prevMessage.full_name,
+						id: prevMessage.id,
+						messageType: prevMessage.message_type,
+						messageTime: timeAgo,
+						roomId: prevMessage.room_id,
+						userId: prevMessage.user_id,
+						profile: prevMessage.user_profile,
+					});
+				});
+
+				// Emit previous messages to the user
+				socket.emit("previous-message", existingMessages);
+			});
+		});
+
+		// Sending messages to all members
+		socket.on("send-message", (data) => {
+			const query =
+				"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
+			db.query(query, [data.userID, data.roomID, data.message], (err) => {
+				if (err) return res.json(err.message);
+
+				const profileQuery =
+					"SELECT users.id, users.profilePic FROM users WHERE id = ?";
+				db.query(profileQuery, [data.userID], (err, userProfile) => {
+					if (err) throw err;
+
+					// Emit new message to all members except the sender
+					socket.to(data.roomID).emit("new-message", {
+						userId: data.userID,
+						roomId: data.roomID,
+						newMessage: data.message,
+						userProfile: userProfile[0]?.profilePic, // Optional chaining to avoid errors
+					});
 				});
 			});
 		});
 
-		io.to(roomID).emit("new-message", {
-			userID,
-			roomID,
-			sendmessage,
-			userProfile,
+		// Handle user disconnection
+		socket.on("disconnect", () => {
+			console.log(`User ${socket.id} disconnected from room ${roomID}`);
 		});
 	});
-});
-
-socket.on("disconnect", () => {
-	console.log(`A user with ${userID} and group id ${roomID} has disconnected`);
-});
-
-server.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
 });
