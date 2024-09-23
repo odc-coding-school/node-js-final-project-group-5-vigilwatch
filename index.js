@@ -106,9 +106,9 @@ app.post("/submit-incident", (req, res) => {
 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
 			// Fetching the reporter's name from users table
-			const userQuery = "SELECT name FROM users WHERE id = ?";
+			const userQuery = "SELECT full_name FROM users WHERE id = ?";
 			const [reporter] = await db.promise().query(userQuery, [userId]);
-			const reporterName = reporter[0] ? reporter[0].name : "Unknown";
+			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
 			// Insert incident into the database
 			const incidentsInsert =
@@ -220,7 +220,7 @@ app.post("/register", async (req, res) => {
 				db.query(query, [address], (err, result) => {
 					if (err) return res.json(err.message);
 					const query = `INSERT INTO users 
-						(full_name, email, password, user_address, room_id) VALUES(?,?,?,?,?)
+						(full_name, email, password, user_address, room_id) VALUES(?, ?, ?, ?, ?)
 					`;
 
 					//assigning the exist room id to the user.room_id
@@ -245,7 +245,7 @@ app.post("/register", async (req, res) => {
 
 							//inserting into the user table if the room address do not exist
 							const query =
-								"INSERT INTO users (full_name, email, password, user_address, room_id) VALUES(?,?,?,?,?)";
+								"INSERT INTO users (full_name, email, password, user_address, room_id) VALUES(?, ?, ?, ?, ?)";
 							db.query(
 								query,
 								[full_name, email, hashedPassword, address, roomID],
@@ -335,7 +335,7 @@ app.get("/chat", (req, res) => {
 			//fetching previous message
 			const query = `
 				SELECT u.id, u.full_name, u.email, u.room_id,
-				 	u.profilePic As user_profile, m.message_id,
+					u.profilePic As user_profile, m.message_id,
                     m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
 					messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
 				`;
