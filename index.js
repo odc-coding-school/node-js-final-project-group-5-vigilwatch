@@ -7,6 +7,7 @@ const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
+const { sendNotification } = require("./config/mailer.js");
 const app = express();
 
 const PORT = 5000;
@@ -59,6 +60,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const policyRoutes = require("./routes/policyRoutes");
 const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
+const incidentSuccessRoutes = require("./routes/IncidentSuccessRoutes");
 const { group } = require("console");
 
 app.use("/", homeRoutes);
@@ -72,21 +74,40 @@ app.use("/analytics", analyticsRoutes);
 app.use("/news", newsRoutes);
 app.use("/policy", policyRoutes);
 app.use("/termsOfService", termsOfServiceRoutes);
+app.use("/incident-success", incidentSuccessRoutes);
 
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
 	res.render("errorEmail", { msg });
 });
 
-// Handle form submission
+app.post("/set-alert", (req, res) => {
+	req.session.hasAlerted = true; // User has clicked "Get Alert"
+	res.json({ success: true });
+});
+
+app.post("/disable-alert", (req, res) => {
+	req.session.hasAlerted = false; // User has clicked "Disable Alert"
+	res.json({ success: true });
+});
+
 app.post("/submit-incident", (req, res) => {
-	upload(req, res, (err) => {
-		if (err) {
-			res.send("Error uploading file");
-		} else {
-			const { incidentType, description, incidentDate, location } = req.body;
+	upload(req, res, async (err) => {
+		try {
+			if (err) {
+				return res.send("Error uploading file");
+			}
+
+			const { userId, incidentType, description, incidentDate, location } =
+				req.body;
 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
+			// Fetching the reporter's name from users table
+			const userQuery = "SELECT name FROM users WHERE id = ?";
+			const [reporter] = await db.promise().query(userQuery, [userId]);
+			const reporterName = reporter[0] ? reporter[0].name : "Unknown";
+
+			// Insert incident into the database
 			const incidentsInsert =
 				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
 			const values = [
@@ -97,14 +118,29 @@ app.post("/submit-incident", (req, res) => {
 				imagePath,
 			];
 
-			db.query(incidentsInsert, values, (err, result) => {
-				if (err) throw err;
-				res.send("Incident reported successfully");
+			await db.promise().query(incidentsInsert, values);
+
+			// Send notification email
+			await sendNotification({
+				location,
+				description,
+				incidentType,
+				date: incidentDate,
+				reporterName,
+				image_path: imagePath,
 			});
+
+			// Increment the notification count in session
+			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
+
+			res.redirect("/incident-success");
+		} catch (error) {
+			console.error("Error reporting incident:", error);
+			res.status(500).json({ message: "Error reporting incident" });
 		}
 	});
 });
-// Send email
+
 app.post("/send-message", (req, res) => {
 	const { name, email, message } = req.body;
 
@@ -139,6 +175,18 @@ app.post("/send-message", (req, res) => {
 		res.redirect(
 			"/success?msg=Your message has been sent! We'll get back to you shortly."
 		);
+	});
+});
+
+// get reported incident
+
+app.get("/get-reported-incidents", (req, res) => {
+	const getIncidentsQuery =
+		"SELECT location, description, incident_date, incident_type, image_path FROM incidents ORDER BY created_at DESC";
+
+	db.query(getIncidentsQuery, (err, results) => {
+		if (err) throw err;
+		res.json({ incidents: results });
 	});
 });
 

@@ -72,7 +72,7 @@ const createTables = () => {
 
 	db.query(createIncidentsTable, (error, result) => {
 		if (error) {
-			console.error("Error creating incidents table: ");
+			console.log(" creating incidents table");
 		} else {
 			console.log("Incidents table created or already exists");
 		}

@@ -41,7 +41,7 @@ router.get("/specific-incidents-per-location", async (req, res) => {
 // Route I used to fetch trends in incidents across locations
 router.get("/incident-trends", async (req, res) => {
 	const query = `
-        SELECT DATE(incident_date) as incidentDate, location, COUNT(*) as incidentCount
+        SELECT incident_date as incidentDate, location, COUNT(*) as incidentCount
         FROM incidents
         GROUP BY incidentDate, location
         ORDER BY incidentDate ASC

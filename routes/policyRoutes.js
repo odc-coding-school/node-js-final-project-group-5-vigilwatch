@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-	res.render("policy");
+	const user = req.session.user || null;
+	res.render("policy", { user });
 });
 
 module.exports = router;
