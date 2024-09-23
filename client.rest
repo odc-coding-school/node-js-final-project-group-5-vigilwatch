@@ -1,3 +1,15 @@
+GET http://localhost:5000/api/loginuser
+
+###
+
+
+GET http://localhost:5000/chat
+###
+
+
+GET http://localhost:5000/api/room
+
+###
 GET http://localhost:5000/members
 
 ###

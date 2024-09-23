@@ -1,16 +1,9 @@
 const express = require('express');
-const chatRoute = express.Router();
-
-const app = express()
+const route = express.Router();
 
 
-
-chatRoute.get('/', (req, res)=>{
-    res.render('chat')
-})
-
-chatRoute.post('/', ()=>{
+route.post('/', () => {
 
 })
 
-module.exports = chatRoute;
+module.exports = route;

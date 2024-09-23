@@ -8,6 +8,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const { sendNotification } = require("./config/mailer.js");
+const setupSocketIO = require("./routes/socketIo-route.js");
+const { formatDistanceToNow, previousDay } = require("date-fns");
+
 const app = express();
 
 const PORT = 5000;
@@ -51,7 +54,6 @@ app.use((req, res, next) => {
 // Our Routes
 const homeRoutes = require("./routes/homeRoutes");
 const contactRoutes = require("./routes/contactRoutes");
-const chatRoutes = require("./routes/chat-route");
 const userRoutes = require("./routes/userRoutes");
 const successRoutes = require("./routes/successRoutes");
 const reportRoutes = require("./routes/reportRoutes");
@@ -62,14 +64,15 @@ const policyRoutes = require("./routes/policyRoutes");
 const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
 const incidentSuccessRoutes = require("./routes/IncidentSuccessRoutes");
 const { group } = require("console");
+const loginUserRoute = require("./routes/login-user-route.js");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
-app.use("/chat", chatRoutes);
 app.use("/user", userRoutes);
 app.use("/success", successRoutes);
 app.use("/report", reportRoutes);
 app.use("/location", locationRoutes);
+app.use("/api", loginUserRoute);
 app.use("/analytics", analyticsRoutes);
 app.use("/news", newsRoutes);
 app.use("/policy", policyRoutes);
@@ -309,6 +312,93 @@ app.post("/logout", (req, res) => {
 	});
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
+});
+
+const io = setupSocketIO(server);
+
+app.get("/chat", (req, res) => {
+	const roomID = req.session.user.room_id;
+	const userID = req.session.user.id;
+	const user = req.session.user || null;
+
+	res.render("chat", { user, isRegistered: !!req.session.user });
+
+	io.on("connection", (socket) => {
+		console.log(socket.id);
+
+		//join the group by the group ID
+		socket.on("join-room", (roomID) => {
+			socket.join(roomID);
+
+			//fetching previous message
+			const query = `
+				SELECT u.id, u.full_name, u.email, u.room_id,
+				 	u.profilePic As user_profile, m.message_id,
+                    m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
+					messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
+				`;
+
+			db.query(query, [roomID], (err, PreviousMessage) => {
+				if (err) throw err;
+				//variable to hold the previous message
+				let existingMessage = { message: [] };
+
+				//iterating over the previousmessage array return from the database
+				PreviousMessage.forEach((prevMessage) => {
+					//formating the date to time ago using data-fns
+					const messagedTime = new Date(prevMessage.messaged_time);
+					const timeAgo = formatDistanceToNow(messagedTime, {
+						addSuffix: true,
+					});
+					console.log(timeAgo);
+
+					existingMessage.message.push({
+						email: prevMessage.email,
+						fullName: prevMessage.full_name,
+						id: prevMessage.id,
+						messageType: prevMessage.message_type,
+						messageTime: timeAgo,
+						roomId: prevMessage.room_id,
+						userId: prevMessage.user_id,
+						profile: prevMessage.user_profile,
+					});
+				});
+
+				socket.emit("previous-message", existingMessage);
+			});
+		});
+
+		//sending the messages to the all members
+		socket.on("send-message", (userID, roomID, sendmessage) => {
+			// console.log(userID, groupID, sendmessage);
+
+			const query =
+				"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
+			db.query(query, [userID, roomID, sendmessage], (err, result) => {
+				if (err) return res.json(err.message);
+
+				//query to attach the user profilet to the previous message base on the id
+				const query = `SELECT users.id, users.profilePic, 
+    			users.user_address FROM users WHERE id = ?`;
+				db.query(query, [userID], (err, userProfile) => {
+					if (err) throw err;
+
+					io.to(roomID).emit("new-message", {
+						userID,
+						roomID,
+						sendmessage,
+						userProfile,
+					});
+				});
+			});
+		});
+
+		socket.on("disconnect", () => {
+			console.log(
+				`A user with ${userID} and group id ${roomID} has disconnected`
+			);
+		});
+	});
 });
