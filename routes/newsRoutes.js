@@ -52,5 +52,27 @@ router.get("/", (req, res) => {
 });
 
 
+router.get("/:id", (req, res)=>{
+	const user = req.session.user || null;
+
+	const  query = "SELECT * FROM incidents WHERE id = ?";
+	const newsId = req.params.id;
+	const error = "News not found";
+
+	db.query(query, [newsId], (err, specificNews)=>{
+		if(err) return res.status(500).json(err.message);
+
+		// if(specificNews.length === 0) return res.status(409).render("singleNew", {error});
+
+		console.log(specificNews);
+		
+		
+	
+		 res.render("singleNew", {url:`http://localhost:5000/news/${specificNews[0].id}`, specificNews, user, isRegistered: !!req.session.user });
+	})
+
+})
+
+
 
 module.exports = router;

@@ -1,3 +1,10 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
 .current-user-bg {
     background-color: blue;
     color: white;
@@ -19,37 +26,24 @@
     align-items: flex-end;
 }
 
-.textarea {
-    /* width: 100%;
-    min-height: 40px;
-    max-width: 200px;
-    resize: none;
-    border-radius: 4px;
-    box-sizing: border-box;
-    overflow-x: hidden; */
 
 
-
-    /*  */
-
-    width: calc(min(100vw - 45px, 841px));
+.input-wrapper {
     display: flex;
-    flex-direction: column;
-    margin: 0px;
-    resize: vertical;
-    background: #161328;
+    align-items: center;
+    margin-inline-end: auto;
+    position:fixed;
+    width: 65%;
+    transform: translateY(330px);
+   
+}
+
+.input-field {
+    flex: 1px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    color: white;
-    padding: 22px;
-    padding-right: 0px;
+    /* border: 1px solid rgba(255, 255, 255, 0.13); */
+    color: black;
+    resize: none;
+    white-space: none;
     font-size: 18px;
-    height: 187px;
-    margin-right: auto;
-    margin-left: auto;
-    overflow: auto;
-    justify-content: space-between;
-    margin-top: 0px;
-    padding-bottom: 47px;
-    min-height: 20px;
 }

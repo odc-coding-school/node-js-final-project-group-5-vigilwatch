@@ -119,15 +119,15 @@ socket.on("previous-message", (previouMessage) => {
 })
 
 form.addEventListener("submit", (e) => {
-    let textMessage = messageInput.value;
-
-    
     e.preventDefault();
 
     //sending the message
     if (messageInput.value) {
         socket.emit("send-message", {userID, roomID, message:messageInput.value});
-        messageInput.value = "";
+        // messageInput.value = "";
+
+        console.log(messageInput.value);
+        
     }
     messageInput.focus();
  

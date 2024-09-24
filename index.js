@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const setupSocketIO = require("./routes/socketIo-route.js");
-const { formatDistanceToNow, previousDay } = require("date-fns");
+const { formatDistanceToNow } = require("date-fns");
 
 
 
@@ -148,24 +148,6 @@ app.post("/send-message", (req, res) => {
 		);
 	});
 });
-
-
-app.get("/news/:id", (req, res)=>{
-	const user = req.session.user || null;
-
-	const  query = "SELECT * FROM incidents WHERE id = ?";
-	const newsId = req.params.id;
-	const error = "News not found";
-
-	db.query(query, [newsId], (err, specificNews)=>{
-		if(err) return res.status(500).json(err.message);
-
-		// if(specificNews.length === 0) return res.status(409).render("news", {error});
-	
-		res.render("singleNew", {specificNews, user, isRegistered: !!req.session.user });
-	})
-
-})
 
 
 app.get("/register", (req, res) => {
@@ -309,14 +291,6 @@ app.get('/chat', (req, res) => {
 		socket.on("join-room", (roomID) => {
 			socket.join(roomID);
 
-			//fetching previous message
-			// const query = `
-			// 	SELECT u.id, u.full_name, u.email, u.room_id,
-			// 	 	u.profilePic As user_profile, m.message_id,
-            //         m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
-			// 		messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
-			// 	`;
-
 			const query = `
 				SELECT u.id, u.full_name, u.email, u.room_id,
 				 	u.profilePic As user_profile, m.message_id,
@@ -409,7 +383,3 @@ app.get('/chat', (req, res) => {
 	})
 
 })
-
-
-
-

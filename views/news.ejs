@@ -1,61 +1,64 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Incident Reports</title>
-		<link rel="stylesheet" href="css/styles.css" />
-		<script src="../scripts/new.js" defer></script>
-	</head>
-	<body class="bg-gray-100">
-		<!-- header -->
-		<%- include('includes/header') %>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Incident Reports</title>
+	<link rel="stylesheet" href="css/styles.css" />
+	<script src="../scripts/new.js" defer></script>
+</head>
+
+<body class="bg-gray-100">
+	<!-- header -->
+	<%- include('includes/header') %>
 		<!-- header end -->
+
 		<h2 class="mt-4 text-3xl font-bold mb-8 text-center">News Center</h2>
 
-		 <article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+		<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 
-			 <% modifiedNews.forEach(news=>{%>
-				<div
-					class="card"
-				>
+			<% modifiedNews.forEach(news=>{%>
+				<div class="card">
 					<!-- Card 1 -->
 					<div class="bg-white rounded-lg shadow-md overflow-hidden">
-   
-					   
-						<img
-							class="w-full h-32 object-cover"
-							src="<%=news.imagePath %>"
-							alt="Incident Image"
-						/>
+
+
+						<img class="w-full h-32 object-cover" src="<%=news.imagePath %>" alt="Incident Image" />
 						<div class="p-3">
 							<div class="flex justify-between items-center">
-								<h2 class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis"><%=news.description%></h2>
-								<p class="text-xs text-gray-500"><%=news.incidentDate%></p>
+								<h2
+									class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+									<%=news.description%>
+								</h2>
+								<p class="text-xs text-gray-500">
+									<%=news.incidentDate%>
+								</p>
 							</div>
-							<p class="text-gray-600 text-xs"><%=news.location%></p>
+							<p class="text-gray-600 text-xs">
+								<%=news.location%>
+							</p>
 							<p class="mt-1 text-gray-700 text-sm">
 								A house in New Georgia was broken into during the evening hour.
 								Police are on the scene investigating.
 							</p>
-							<a
-								href="/news/<%=news.id %>"
-								class="block mt-3 bg-red-500 text-white text-center py-1 rounded hover:bg-red-600 text-sm"
-								> <button class="viewmore-btn">View more</button></a
-							>
+							<a href="/news/<%=news.id %>"
+								class="block mt-3 bg-red-500 text-white text-center py-1 rounded hover:bg-red-600 text-sm">
+								<button class="viewmore-btn">View more</button></a>
 						</div>
 					</div>
-		
-					
-					
+
+
+
 				</div>
-				
-			<%})%>
-			
-		 </article>
+
+				<%})%>
+
+		</article>
 
 		<!-- footer -->
 		<%- include('includes/footer') %>
-		<!-- footer end -->
-	</body>
+			<!-- footer end -->
+</body>
+
 </html>

@@ -57,7 +57,7 @@ router.post(
 				return res.status(400).send("No file uploaded or invalid file type.");
 			}
 
-			const profilePicPath = `/uploads/${req.file.filename}`;
+			const profilePicPath = req.file`/uploads/${req.file.filename}`;
 
 			// updating the user profile picture in our database
 			db.query(

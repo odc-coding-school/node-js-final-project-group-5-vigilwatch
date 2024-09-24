@@ -11,7 +11,8 @@ export default {
 	content: [
 		"./views/**/*.ejs", // Include all EJS files in the views folder
 		"./public/**/*.js",// Include any JS files in the public folder (optional)
-		"./src/css/**/*.css", 
+		"./public/**/*.html",// Include any JS files in the public folder (optional)
+		"./src/css/**/*.css" 
 	],
 	theme: {
 		extend: {
@@ -21,6 +22,37 @@ export default {
 				customblue: "#1877f2"
 			},
 			
+			animation: {
+				"slide-in": "slideIn 0.3s ease-out forward", 
+				"slide-out": "slideOut 0.3s ease-out forward", 
+			},
+			keyframes: {
+				slideIn: {
+					"from":{
+						left:'-250px',
+						opacity: "0"
+					},
+					'to':{
+						left:'0',
+						opacity: "1"
+					},
+
+				},
+				
+				slideOut: {
+					"from":{
+						left:'0',
+						
+					},
+					'to':{
+						left:'-240px',
+					
+					},
+
+				},
+				
+				
+			}
 		},
 	},
 	plugins: [],
