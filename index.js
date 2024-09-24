@@ -96,10 +96,8 @@ app.post("/disable-alert", (req, res) => {
 
 // Get Reported Incidents
 app.get("/get-reported-incidents", (req, res) => {
-	const getIncidentsQuery =
-		"SELECT location, description FROM incidents ORDER BY created_at DESC";
-
-	db.query(getIncidentsQuery, (err, results) => {
+	const query = "SELECT * FROM incidents"; // Adjust the query as needed
+	db.query(query, (err, results) => {
 		if (err) throw err;
 		res.json({ incidents: results });
 	});
