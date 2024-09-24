@@ -74,7 +74,10 @@ const createTables = () => {
 			incident_date DATETIME NOT NULL,
 			location VARCHAR(255) NOT NULL,
 			image_path VARCHAR(255),
+			location_lat DECIMAL(10, 8),
+			location_lng DECIMAL(11, 8);
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
 		);
 `;
 

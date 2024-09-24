@@ -94,6 +94,17 @@ app.post("/disable-alert", (req, res) => {
 	res.json({ success: true });
 });
 
+// Get Reported Incidents
+app.get("/get-reported-incidents", (req, res) => {
+	const getIncidentsQuery =
+		"SELECT location, description FROM incidents ORDER BY created_at DESC";
+
+	db.query(getIncidentsQuery, (err, results) => {
+		if (err) throw err;
+		res.json({ incidents: results });
+	});
+});
+
 app.post("/submit-incident", (req, res) => {
 	upload(req, res, async (err) => {
 		try {
@@ -106,9 +117,22 @@ app.post("/submit-incident", (req, res) => {
 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
 			// Fetching the reporter's name from users table
-			const userQuery = "SELECT full_name FROM users WHERE id = ?";
-			const [reporter] = await db.promise().query(userQuery, [userId]);
+			const userName = "SELECT full_name FROM users WHERE id = ?";
+			const [reporter] = await db.promise().query(userName, [userId]);
 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
+
+			// Fetch user's registered location
+			const userAddress = "SELECT user_address FROM users WHERE id = ?";
+			const [userResult] = await db.promise().query(userAddress, [userId]);
+			const userLocation = userResult[0] ? userResult[0].user_address : null;
+
+			if (userLocation && location !== userLocation) {
+				return res
+					.status(400)
+					.send(
+						"Error: The location entered doesn't match your registered location."
+					);
+			}
 
 			// Insert incident into the database
 			const incidentsInsert =
