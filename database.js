@@ -26,8 +26,8 @@ db.connect(function (err) {
 // );
 
 // db.query(
-// 	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"), 
-// 	(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"), 
+// 	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"),
+// 	(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"),
 // 	(DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
 // 	(DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
 // 	(DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
@@ -58,6 +58,14 @@ const createTables = () => {
         )
     `;
 
+	db.query(createUsersTable, (error, result) => {
+		if (error) {
+			console.log(" creating users table");
+		} else {
+			console.log("Users table created or already exists");
+		}
+	});
+
 	const createIncidentsTable = `
 		CREATE TABLE incidents (
 			id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,20 +74,23 @@ const createTables = () => {
 			incident_date DATETIME NOT NULL,
 			location VARCHAR(255) NOT NULL,
 			image_path VARCHAR(255),
+			location_lat DECIMAL(10, 8),
+			location_lng DECIMAL(11, 8);
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
 		);
 `;
 
-const message_table = `
+	const message_table = `
 	CREATE TABLE IF NOT EXISTS messages
 		(message_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, room_id INT, 
 		message_type VARCHAR(255), messaged_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (room_id) REFERENCES room(room_id))
-	`
+	`;
 
 	db.query(createIncidentsTable, (error, result) => {
 		if (error) {
-			console.error("Error creating incidents table: ");
+			console.log(" creating incidents table");
 		} else {
 			console.log("Incidents table created or already exists");
 		}
@@ -102,7 +113,6 @@ const message_table = `
 			console.log("message table created or already exists");
 		}
 	});
-
 };
 
 createTables();

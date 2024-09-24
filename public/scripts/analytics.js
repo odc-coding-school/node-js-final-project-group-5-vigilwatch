@@ -74,9 +74,7 @@ fetch("/analytics/specific-incidents-per-location")
 fetch("/analytics/incident-trends")
 	.then((response) => response.json())
 	.then((data) => {
-		const labels = data.map((item) =>
-			new Date(item.incidentDate).toLocaleString()
-		);
+		const labels = data.map((item) => formatDate(new Date(item.incidentDate)));
 		const locations = [...new Set(data.map((item) => item.location))];
 
 		const datasets = locations.map((location) => ({
@@ -84,7 +82,7 @@ fetch("/analytics/incident-trends")
 			data: labels.map((date) => {
 				const entry = data.find(
 					(item) =>
-						new Date(item.incidentDate).toLocaleString() === date &&
+						formatDate(new Date(item.incidentDate)) === date &&
 						item.location === location
 				);
 				return entry ? entry.incidentCount : 0;
@@ -102,6 +100,19 @@ fetch("/analytics/incident-trends")
 			},
 		});
 	});
+
+// Function to format date as "Jan DD, YYYY HH:MM AM/PM"
+function formatDate(date) {
+	const options = {
+		month: "short",
+		day: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
+	};
+	return date.toLocaleString("en-US", options);
+}
 
 // to get a random color when reload the page
 function getRandomColor() {

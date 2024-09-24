@@ -1,23 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Chat</title>
+		<link rel="stylesheet" href="/css/styles.css" />
+		<link rel="stylesheet" href="/css/extra-style.css" />
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="../scripts/chat.js" defer></script>
+	</head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/extra-style.css">
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="../scripts/chat.js" defer></script>
-</head>
-
-
-
-<body class="flex flex-col h-screen bg-neutral-900">
-
-    <!-- Header -->
-    <%- include('includes/header') %>
-        <!-- header end -->
+	<body class="flex flex-col h-screen bg-neutral-900">
+		<!-- Header -->
+		<%- include('includes/header') %>
+		<!-- header end -->
 
         <main class="chat-box bg-gray-100 p-4 flex-grow flex mt-24 fixed right-20 left-20 bottom-0 top-0">
             <a href="./" class="fixed">
@@ -69,7 +65,7 @@
                 </section>
 
 
-                <!-- <div
+				<!-- <div
                     class="wrapper message-button-wrapper flex rounded-2xl font-semibold font-sans border border-gray-500">
 
                 </div> -->
