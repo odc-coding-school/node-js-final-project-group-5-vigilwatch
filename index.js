@@ -11,6 +11,8 @@ const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
 
+const cors = require("cors");
+
 const app = express();
 
 const PORT = 5000;
@@ -20,6 +22,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 
+app.use(
+	cors({
+		origin: "https://localhost:5000",
+	})
+);
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
