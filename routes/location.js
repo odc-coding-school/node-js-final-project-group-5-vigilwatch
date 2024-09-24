@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 		if (req.session.user) {
 			return next();
 		}
-		res.redirect("/login");
+		res.redirect("http://localhost:5000/login");
 	};
 
 	router.get("/", (req, res) => {

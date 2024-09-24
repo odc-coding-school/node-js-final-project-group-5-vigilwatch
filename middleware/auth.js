@@ -3,7 +3,7 @@ function registeredUsers(req, res, next) {
 		// Checkign if user session exists
 		return next();
 	} else {
-		res.redirect("/login");
+		res.redirect("http://localhost:5000/login");
 	}
 }
 
