@@ -58,7 +58,7 @@ console.log(roomID);
 console.log(userID);
 
 //requiring socket io client
-const socket = io();
+const socket = io()
 
 //join the group buy the group id
 socket.emit("join-room", roomID);
