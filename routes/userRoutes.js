@@ -41,7 +41,7 @@ const ensureAuthenticated = (req, res, next) => {
 	if (req.session.user) {
 		return next();
 	}
-	res.redirect("/login");
+	res.redirect("http://localhost:5000/login");
 };
 
 // Route for uploading profile image user profile
@@ -70,7 +70,7 @@ router.post(
 					}
 					// updating the user profile picture in our session
 					req.session.user.profilePic = profilePicPath;
-					res.redirect("/");
+					res.redirect("http://localhost:5000/");
 				}
 			);
 		} catch (error) {

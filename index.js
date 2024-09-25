@@ -11,8 +11,7 @@ const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
 
-
-
+const cors = require("cors");
 
 const app = express();
 
@@ -23,6 +22,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 
+app.use(
+	cors({
+		origin: "https://localhost:5000",
+	})
+);
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
@@ -161,7 +165,7 @@ app.post("/submit-incident", (req, res) => {
 			// Increment the notification count in session
 			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
 
-			res.redirect("/incident-success");
+			res.redirect("http://localhost:5000/incident-success");
 		} catch (error) {
 			console.error("Error reporting incident:", error);
 			res.status(500).json({ message: "Error reporting incident" });
@@ -197,15 +201,16 @@ app.post("/send-message", (req, res) => {
 			console.error("Error sending email:", error);
 			return res
 				.status(500)
-				.redirect("/error?msg=Error occurred while sending email.");
+				.redirect(
+					"http://localhost:5000/error?msg=Error occurred while sending email."
+				);
 		}
 		console.log("Email sent:", info.response);
 		res.redirect(
-			"/success?msg=Your message has been sent! We'll get back to you shortly."
+			"http://localhost:5000/success?msg=Your message has been sent! We'll get back to you shortly."
 		);
 	});
 });
-
 
 app.get("/register", (req, res) => {
 	res.render("register");
@@ -247,7 +252,7 @@ app.post("/register", async (req, res) => {
 							[full_name, email, hashedPassword, address, roomID],
 							(err, result) => {
 								if (err) return res.json(err.message);
-								res.redirect("/login");
+								res.redirect("http://localhost:5000/login");
 							}
 						);
 					} else {
@@ -265,7 +270,7 @@ app.post("/register", async (req, res) => {
 								[full_name, email, hashedPassword, address, roomID],
 								(err, result) => {
 									if (err) return res.json(err.message);
-									res.redirect("/login");
+									res.redirect("http://localhost:5000/login");
 								}
 							);
 						});
@@ -311,7 +316,7 @@ app.post("/login", async (req, res) => {
 					profilePic: user.profilePic,
 				};
 
-				res.redirect("/");
+				res.redirect("http://localhost:5000/");
 			}
 		);
 	} catch (err) {
@@ -322,7 +327,7 @@ app.post("/login", async (req, res) => {
 // Logout Route
 app.post("/logout", (req, res) => {
 	req.session.destroy(() => {
-		res.redirect("/login");
+		res.redirect("http://localhost:5000/login");
 	});
 });
 
@@ -355,7 +360,7 @@ app.get("/chat", (req, res) => {
 			// const query = `
 			// 	SELECT u.id, u.full_name, u.email, u.room_id,
 			// 	 	u.profilePic As user_profile, m.message_id,
-            //         m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
+			//         m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
 			// 		messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
 			// 	`;
 
