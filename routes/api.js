@@ -10,7 +10,7 @@ router.get('/loginuser', (req, res) => {
 	//checking if user exists
     if (req.session.user) {
 		const query = `
-			SELECT users.id, users.room_id, 
+			SELECT users.id, users.room_id, users.full_name AS username, 
 				users.profilePic, users.user_address FROM
 			users WHERE id = ?`;
 	//getting the user if the user exist from login

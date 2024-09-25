@@ -420,7 +420,7 @@ app.get("/chat", (req, res) => {
 
 	// Handle socket connection inside the chat route
 	io.on("connection", (socket) => {
-		console.log(`User connected: ${socket.id}`);
+		console.log(`User with id ${userID} from room ${roomID} connected: `);
 
 		// Join the group by the group ID
 		socket.on("join-room", (roomID) => {
@@ -435,39 +435,39 @@ app.get("/chat", (req, res) => {
 			// 		messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
 			// 	`;
 
-			// const query = `
-			//     SELECT u.id, u.full_name, u.email, u.room_id,
-			//     u.profilePic AS user_profile, m.message_id,
-			//     m.user_id, m.room_id, m.message_type, m.messaged_time
-			//     FROM users AS u
-			//     JOIN messages AS m ON (u.room_id = m.room_id)
-			//     WHERE m.room_id = ?;
-			// `;
-			// db.query(query, [roomID], (err, previousMessages) => {
-			// 	if (err) throw err;
+			const query = `
+                SELECT u.id, u.full_name, u.email, u.room_id,
+                u.profilePic AS user_profile, m.message_id,
+                m.user_id, m.room_id, m.message_type, m.messaged_time
+                FROM users AS u
+                JOIN messages AS m ON (u.room_id = m.room_id)
+                WHERE m.room_id = ?;
+            `;
+			db.query(query, [roomID], (err, previousMessages) => {
+				if (err) throw err;
 
-			// 	let existingMessages = { message: [] };
-			// 	previousMessages.forEach((prevMessage) => {
-			// 		const messagedTime = new Date(prevMessage.messaged_time);
-			// 		const timeAgo = formatDistanceToNow(messagedTime, {
-			// 			addSuffix: true,
-			// 		});
+				let existingMessages = { message: [] };
+				previousMessages.forEach((prevMessage) => {
+					const messagedTime = new Date(prevMessage.messaged_time);
+					const timeAgo = formatDistanceToNow(messagedTime, {
+						addSuffix: true,
+					});
 
-			// 		existingMessages.message.push({
-			// 			email: prevMessage.email,
-			// 			fullName: prevMessage.full_name,
-			// 			id: prevMessage.id,
-			// 			messageType: prevMessage.message_type,
-			// 			messageTime: timeAgo,
-			// 			roomId: prevMessage.room_id,
-			// 			userId: prevMessage.user_id,
-			// 			profile: prevMessage.user_profile,
-			// 		});
-			// 	});
+					existingMessages.message.push({
+						email: prevMessage.email,
+						fullName: prevMessage.full_name,
+						id: prevMessage.id,
+						messageType: prevMessage.message_type,
+						messageTime: timeAgo,
+						roomId: prevMessage.room_id,
+						userId: prevMessage.user_id,
+						profile: prevMessage.user_profile,
+					});
+				});
 
-			// 	// Emit previous messages to the user
-			// 	socket.emit("previous-message", existingMessages);
-			// });
+				// Emit previous messages to the user
+				socket.emit("previous-message", existingMessages);
+			});
 		});
 
 		// Sending messages to all members

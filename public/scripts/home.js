@@ -1,5 +1,4 @@
 
-
 //Fetch user Data on HomePage 
 document.addEventListener("DOMContentLoaded", ()=>{
 
@@ -16,10 +15,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         throw new Error("Failed to fetch user data")
     })
     .then(data=>{
-        localStorage.setItem("token", JSON.stringify(data));
-
-        console.log(data);
-        
+        localStorage.setItem("token", JSON.stringify(data)); 
     })
 
 
@@ -33,8 +29,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     })
     .then(data=>{
         localStorage.setItem("room", JSON.stringify(data));
-        console.log(data);
-        
     })
 })
+
 
