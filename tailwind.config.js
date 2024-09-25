@@ -21,38 +21,7 @@ export default {
 				customgray:"#969191",
 				customblue: "#1877f2"
 			},
-			
-			animation: {
-				"slide-in": "slideIn 0.3s ease-out forward", 
-				"slide-out": "slideOut 0.3s ease-out forward", 
-			},
-			keyframes: {
-				slideIn: {
-					"from":{
-						left:'-250px',
-						opacity: "0"
-					},
-					'to':{
-						left:'0',
-						opacity: "1"
-					},
 
-				},
-				
-				slideOut: {
-					"from":{
-						left:'0',
-						
-					},
-					'to':{
-						left:'-240px',
-					
-					},
-
-				},
-				
-				
-			}
 		},
 	},
 	plugins: [],

@@ -63,6 +63,16 @@ const socket = io();
 //join the group buy the group id
 socket.emit("join-room", roomID);
 
+
+//alertind to the frnt end about a user joining he group
+socket.on("join-room", joinedUser =>{
+	const joinedWrapper =document.createElement('div');
+	joinedWrapper.innerHTML = `${joinedUser} joined the group`;
+	chatMessageHolder.appendChild(joinedWrapper)
+
+	console.log(joinedWrapper);
+})
+
 //previous messages display to all user in group
 socket.on("previous-message", (previouMessage) => {
 	previouMessage.message.map((prevMessage) => {

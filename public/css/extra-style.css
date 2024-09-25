@@ -1,4 +1,4 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -14,7 +14,7 @@
 }
 
 .members-bg {
-    background-color:  #e5e7eb;
+    background-color: #e5e7eb;
     color: black;
     padding: 10px;
     border-radius: 5px;
@@ -32,10 +32,10 @@
     display: flex;
     align-items: center;
     margin-inline-end: auto;
-    position:fixed;
+    position: fixed;
     width: 65%;
     transform: translateY(330px);
-   
+
 }
 
 .input-field {
@@ -46,4 +46,63 @@
     resize: none;
     white-space: none;
     font-size: 18px;
+}
+
+
+/* toogle navbar */
+.toogle-container {
+    
+    position: fixed;
+    top: 85px;
+    right: 0;
+    width: 250px;
+    bottom: 0;
+
+    /* animation: hide 0.5s; */
+    transition: 1000ms ease-in-out;
+}
+
+ul {
+    display: flex;
+    align-items: center;
+}
+
+
+ul .navbar-link {
+    width: 100%;
+    margin-bottom: 5px;
+
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 1rem;
+}
+
+.navbar-link:hover {
+    background-color: rgba(0, 0, 0, .2);
+}
+
+ul li {
+
+    padding-left: 10px;
+}
+
+.menu {
+    z-index: 10;
+    transition: all cubic-bezier(0.075, 0.82, 0.165, 1) 1s;
+    color: white;
+    cursor: pointer;
+    margin-left: 2rem;
+}
+
+.toogle-container.show {
+    /* display: block; */
+   right: 0px;
+    opacity: 1;
+}
+
+.toogle-container:not(.show) {
+    /* display: none; */
+    right: -300px;
+    opacity: 0;
 }

@@ -1,7 +1,13 @@
+<link rel="stylesheet" href="/css/extra-style.css">
+
+
+
+
+
 <header class="bg-red-700 py-6 shadow-md fixed right-0 left-0 top-0 z-10">
     <div class="container mx-auto px-4 flex justify-between items-center">
         <h1 class="text-3xl font-bold text-white">HubWatch</h1>
-        
+
 
         <nav class="flex items-center justify-between">
             <ul class="space-x-6 text-white items-center hidden md:flex">
@@ -48,7 +54,7 @@
                         <% } %>
             </ul>
 
-            <div class="space-x-6 text-white cursor-pointer hover:rotate-90 transition-all ml-20 md:hidden z-50" id="menu">
+            <div class="menu md:hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
                     viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
@@ -56,18 +62,39 @@
                     </path>
                 </svg>
             </div>
-    
+
         </nav>
     </div>
 </header>
 
-<div class="toogle-container show fixed bg-blue-900 right-0 top-20 w-full hidden">
+<div class="toogle-container bg-blue-900 md:hidden">
 
-    <ul class="space-x-6 text-white flex flex-col text-2xl p-4 items-center justify-between">
-        <li><a href="/" class="hover:bg-gray-300 px-36 mt-10 hover:text-black w-full">Home</a></li>
-        <li><a href="/report" class="hover:bg-gray-300 px-20 mt-10  hover:text-black">Report Incident</a></li>
-        <li><a href="/analytics" class="hover:bg-gray-300 px-36 mt-10 hover:text-black">Analytics</a></li>
-        <li><a href="/news" class="hover:bg-gray-300 px-36 mt-10 hover:text-black">News</a></li>
+    <ul class="space-x-6 text-white flex flex-col text-2xl">
+
+        <div class="navbar-link">
+            <li><a href="/" class="link">Home</a></li>
+        </div>
+
+        <div class="navbar-link">
+            <li><a href="/report" class="link">Report Incident</a></li>
+        </div>
+
+        <div class="navbar-link">
+            <li><a href="/analytics" class="link">Analytics</a></li>
+        </div>
+
+        <div class="navbar-link">
+            <li><a href="/news" class=" hover:text-black">News</a></li>
+        </div>
+
+        <div class="navbar-link">
+            <li>
+                <form action="/logout" method="POST" class="block px-4 py-2">
+                    <button type="submit"
+                        class="w-full text-left text-white">Logout</button>
+                </form>
+            </li>
+        </div>
 
 
         <!-- <% if (isRegistered) { %>
@@ -125,14 +152,17 @@
         }
 
 
-        const menuIcon = document.getElementById('menu')
-        const toogleContainer = document.querySelector('.toogle-container')
-
-
-        menuIcon.addEventListener('click', ()=>{
-           toogleContainer.classList.toggle("hidden"); 
-         
-        })
-
     });
+
+    const menuIcon = document.querySelector('.menu')
+    const toogleContainer = document.querySelector('.toogle-container')
+
+
+    console.log(menuIcon);
+    console.log(toogleContainer);
+
+
+    menuIcon.addEventListener('click', () => {
+        toogleContainer.classList.toggle("show")
+    })
 </script>

@@ -97,13 +97,13 @@ const createTables = () => {
 	});
 
 	// run the queries
-	// db.query(createUsersTable, (error, result) => {
-	// 	if (error) {
-	// 		console.error("Error creating users table: ", error);
-	// 	} else {
-	// 		console.log("Users table created or already exists");
-	// 	}
-	// });
+	db.query(createUsersTable, (error, result) => {
+		if (error) {
+			console.error("Error creating users table: ", error);
+		} else {
+			console.log("Users table created or already exists");
+		}
+	});
 
 	// run the message queries
 	db.query(message_table, (error, result) => {
