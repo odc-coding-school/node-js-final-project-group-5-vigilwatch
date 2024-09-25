@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: hubwatch
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    region: oregon # You can choose another region if needed
