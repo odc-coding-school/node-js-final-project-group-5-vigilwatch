@@ -5,7 +5,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>HubWatch - Help Keep Your Neighborhood Safe</title>
 		<link rel="stylesheet" href="css/styles.css" />
-		<script src="../scripts/chat.js" defer></script>
+		
+		<% if(user && isRegistered) {%>
+			<script src="../scripts/chat.js" defer></script>
+			<script src="../scripts/home.js" defer></script>
+		<%}%>
 
 		<style>
 			#notification-icon {
