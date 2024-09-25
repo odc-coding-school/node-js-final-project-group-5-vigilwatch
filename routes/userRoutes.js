@@ -5,15 +5,18 @@ const fs = require("fs");
 const db = require("../database.js");
 const router = express.Router();
 
+// this  Configure multer storage
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		const uploadFolder = "public/uploads";
+		// Check if the directory exists, if not create it
 		if (!fs.existsSync(uploadFolder)) {
 			fs.mkdirSync(uploadFolder, { recursive: true });
 		}
 		cb(null, uploadFolder);
 	},
 	filename: function (req, file, cb) {
+		// Appending the current timestamp to avoid file name conflicts
 		cb(null, Date.now() + path.extname(file.originalname));
 	},
 });
@@ -29,53 +32,56 @@ const upload = multer({
 		const mimetype = filetypes.test(file.mimetype);
 
 		if (extname && mimetype) {
-			return cb(null, true);
+			cb(null, true);
 		} else {
-			cb("Error: Images Only!");
+			cb(new Error("Error: Images Only!"));
 		}
 	},
 });
 
-//  Ensuring user is authenticated
+// Middleware to check if user is authenticated before adding profilePic
 const ensureAuthenticated = (req, res, next) => {
-	if (req.session.user) {
-		return next();
+	if (req.session && req.session.user) {
+		// Check if session and user exist
+		return next(); // Proceed to next middleware/route handler
 	}
-	res.redirect("http://localhost:5000/login");
+	res.redirect("/login"); // Redirect to login if not authenticated
 };
 
-// Route for uploading profile image user profile
+//this is the Route for uploading profile image
 router.post(
 	"/upload-profile",
 	ensureAuthenticated,
-	upload.single("profilePic"),
+	upload.single("profilePic"), // Handle single file upload with "profilePic" field name
 	async (req, res) => {
 		try {
 			const userId = req.session.user.id;
 
 			if (!req.file) {
+				// Check if a file is uploaded
 				return res.status(400).send("No file uploaded or invalid file type.");
 			}
 
-			const profilePicPath = req.file`/uploads/${req.file.filename}`;
+			const profilePicPath = `/uploads/${req.file.filename}`; // Construct file path
 
-			// updating the user profile picture in our database
+			// Update the user profile picture in the database
 			db.query(
 				"UPDATE users SET profilePic = ? WHERE id = ?",
 				[profilePicPath, userId],
 				(err) => {
 					if (err) {
 						console.error(err);
-						return res.status(500).send("Server error");
+						return res.status(500).send("Server error"); // Return server error if query fails
 					}
-					// updating the user profile picture in our session
+
+					// Update the user profile picture in session data
 					req.session.user.profilePic = profilePicPath;
-					res.redirect("http://localhost:5000/");
+					res.redirect("/"); // Redirect to home or profile page
 				}
 			);
 		} catch (error) {
 			console.error(error);
-			res.status(500).send("Server error");
+			res.status(500).send("Server error"); // Return generic server error
 		}
 	}
 );
