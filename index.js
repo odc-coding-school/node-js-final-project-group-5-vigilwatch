@@ -342,89 +342,98 @@ app.get("/chat", (req, res) => {
 	const userID = req.session.user.id;
 	const userName = req.session.user.name
 
-	console.log(userName);
 	
 	const user = req.session.user || null;
 	res.render("chat", { user, isRegistered: !!req.session.user });
+});
 
-	// Handle socket connection inside the chat route
-	io.on("connection", (socket) => {
-		console.log(`User with id ${userID} from room ${roomID} connected: `);
+// Handle socket connection inside the chat route
+io.on("connection", (socket) => {
 
-		// Join the group by the group ID
-		socket.on("join-room", (roomID) => {
-			socket.join(roomID);
-			socket.broadcast.emit("join-room", userName);
+	// Join the group by the group ID
+	socket.on("join-room", roomID =>{
+		socket.join(roomID);
 
-			//fetching previous message
-			// const query = `
-			// 	SELECT u.id, u.full_name, u.email, u.room_id,
-			// 	 	u.profilePic As user_profile, m.message_id,
-			//         m.user_id, m.room_id, m.message_type, m.messaged_time FROM users AS u JOIN
-			// 		messages AS m ON(u.room_id = m.room_id) WHERE m.room_id = ?;
-			// 	`;
 
-			const query = `
-                SELECT u.id, u.full_name, u.email, u.room_id,
-                u.profilePic AS user_profile, m.message_id,
-                m.user_id, m.room_id, m.message_type, m.messaged_time
-                FROM users AS u
-                JOIN messages AS m ON (u.room_id = m.room_id)
-                WHERE m.room_id = ?;
-            `;
-			db.query(query, [roomID], (err, previousMessages) => {
+		// fetching existing messages from the mrssage table
+		const query = `
+			SELECT u.id, u.full_name, u.email, u.room_id,
+			u.profilePic AS user_profile, m.message_id,
+			m.user_id, m.room_id, m.message_type, m.messaged_time
+			FROM users AS u
+			JOIN messages AS m ON (m.user_id = u.id)
+			WHERE m.room_id = ?
+		`;
+		db.query(query, [roomID], (err, previousMessages) => {
+			if (err) throw err;
+
+			let existingMessages = { message: [] };
+			previousMessages.forEach((prevMessage) => {
+				const messagedTime = new Date(prevMessage.messaged_time);
+				const timeAgo = formatDistanceToNow(messagedTime, {
+					addSuffix: true,
+				});
+
+				existingMessages.message.push({
+					email: prevMessage.email,
+					fullName: prevMessage.full_name,
+					id: prevMessage.id,
+					messageType: prevMessage.message_type,
+					messageTime: timeAgo,
+					roomId: prevMessage.room_id,
+					userId: prevMessage.user_id,
+					profile: prevMessage.user_profile,
+				});
+			});
+
+			// Emit previous messages to the user
+			socket.emit("previous-message", existingMessages);
+		});
+	});
+
+
+
+
+
+	// Sending messages to all members
+	socket.on("send-message", (data) => {
+		
+		const query =
+			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
+		db.query(query, [data.userID, data.roomID, data.message], (err) => {
+			if (err) return res.json(err.message);
+
+			const profileQuery =
+				"SELECT users.id, users.profilePic FROM users WHERE id = ?";
+			db.query(profileQuery, [data.userID], (err, userProfile) => {
 				if (err) throw err;
 
-				let existingMessages = { message: [] };
-				previousMessages.forEach((prevMessage) => {
-					const messagedTime = new Date(prevMessage.messaged_time);
-					const timeAgo = formatDistanceToNow(messagedTime, {
-						addSuffix: true,
-					});
+				
 
-					existingMessages.message.push({
-						email: prevMessage.email,
-						fullName: prevMessage.full_name,
-						id: prevMessage.id,
-						messageType: prevMessage.message_type,
-						messageTime: timeAgo,
-						roomId: prevMessage.room_id,
-						userId: prevMessage.user_id,
-						profile: prevMessage.user_profile,
-					});
+				// Emit new message to all members except the sender
+				socket.to(data.roomID).emit("new-message", {
+					userId: data.userID,
+					roomId: data.roomID,
+					newMessage: data.message,
+					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
 				});
 
-				// Emit previous messages to the user
-				socket.emit("previous-message", existingMessages);
+				//Emit new message to the senders
+				socket.emit("new-message", {
+					userId: data.userID,
+					roomId: data.roomID,
+					newMessage: data.message,
+					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
+				});
+
 			});
 		});
 
-		// Sending messages to all members
-		socket.on("send-message", (data) => {
-			const query =
-				"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
-			db.query(query, [data.userID, data.roomID, data.message], (err) => {
-				if (err) return res.json(err.message);
+		
+	});
 
-				const profileQuery =
-					"SELECT users.id, users.profilePic FROM users WHERE id = ?";
-				db.query(profileQuery, [data.userID], (err, userProfile) => {
-					if (err) throw err;
-
-					// Emit new message to all members except the sender
-					socket.to(data.roomID).emit("new-message", {
-						userId: data.userID,
-						roomId: data.roomID,
-						newMessage: data.message,
-						userProfile: userProfile[0]?.profilePic, // Optional chaining to avoid errors
-					});
-				});
-			});
-		});
-
-		// Handle user disconnection
-		socket.on("disconnect", () => {
-			console.log(`User ${socket.id} disconnected from room ${roomID}`);
-		});
+	// Handle user disconnection
+	socket.on("disconnect", () => {
+		console.log("user disconnected from the chat");
 	});
 });

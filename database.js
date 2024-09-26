@@ -17,30 +17,8 @@ db.connect(function (err) {
 	console.log("database connected");
 });
 
-// db.query(
-// 	`CREATE TABLE IF NOT EXISTS location (
-// 	id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`,
-// 	(err, result) => {
-// 		console.log("Location Table created successfully");
-// 	}
-// );
 
-// db.query(
-// 	`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"),
-// 	(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"),
-// 	(DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
-// 	(DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
-// 	(DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
-// 	(DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
-// 	(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
 
-// 	`,
-// 	(err, result) => {
-// 		if (err) return console.log(err.message);
-
-// 		console.log("Insert into the location table successful");
-// 	}
-// );
 
 const createTables = () => {
 	const createUsersTable = `
@@ -66,6 +44,8 @@ const createTables = () => {
 		}
 	});
 
+
+	// Incident query
 	const createIncidentsTable = `
 		CREATE TABLE incidents (
 			id INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,6 +61,16 @@ const createTables = () => {
 		);
 `;
 
+db.query(createIncidentsTable, (error, result) => {
+	if (error) {
+		console.log(" creating incidents table");
+	} else {
+		console.log("Incidents table created or already exists");
+	}
+});
+
+
+//Message table query
 	const message_table = `
 	CREATE TABLE IF NOT EXISTS messages
 		(message_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, room_id INT, 
@@ -88,24 +78,7 @@ const createTables = () => {
 		FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (room_id) REFERENCES room(room_id))
 	`;
 
-	db.query(createIncidentsTable, (error, result) => {
-		if (error) {
-			console.log(" creating incidents table");
-		} else {
-			console.log("Incidents table created or already exists");
-		}
-	});
-
-	// run the queries
-	db.query(createUsersTable, (error, result) => {
-		if (error) {
-			console.error("Error creating users table: ", error);
-		} else {
-			console.log("Users table created or already exists");
-		}
-	});
-
-	// run the message queries
+	
 	db.query(message_table, (error, result) => {
 		if (error) {
 			console.error("Error creating users table: ", error);
@@ -113,6 +86,49 @@ const createTables = () => {
 			console.log("message table created or already exists");
 		}
 	});
+
+	// room Query
+	const room_table = `
+	CREATE TABLE IF NOT EXISTS room
+		(room_id INT PRIMARY KEY AUTO_INCREMENT, address VARCHAR(255), createdAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+	`;
+
+	db.query(room_table, (error, result) => {
+		if (error) {
+			console.error("Error creating users table: ", error);
+		} else {
+			console.log("room table created or already exists");
+		}
+	});
+
+		// Location query 
+	db.query(
+		`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"),
+		(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"),
+		(DEFAULT, "Mamba Point"), (DEFAULT, "Duala"), (DEFAULT, "Gardnersville"),
+		(DEFAULT, "Bushrod Island"), (DEFAULT, "Logan Town"), (DEFAULT, "Vai Town"), (DEFAULT, "Lakpazee"),
+		(DEFAULT, "Jallah Town"), (DEFAULT, "Old Road"), (DEFAULT, "Barnersville"), (DEFAULT, "Red Light"), (DEFAULT, "ELWA Junction"),
+		(DEFAULT, "Jacob Town"), (DEFAULT, "Caldwell"), (DEFAULT, "Matadi Estate"), (DEFAULT, "Chocolate City"), (DEFAULT, "Stephen tolber Estate"),
+		(DEFAULT, "Chugbor"), (DEFAULT, "Fiamah"), (DEFAULT, "Plunkor"), (DEFAULT, "Doe Community"), (DEFAULT, "Jamaica Road"), (DEFAULT, "Gbangay Town"), (DEFAULT, "Johnsonville")
+	
+		`,
+		(err, result) => {
+			if (err) return console.log(err.message);
+	
+			console.log("Insert into the location table successful");
+		}
+	);
+
+	db.query(
+		`CREATE TABLE IF NOT EXISTS location (
+		id INT AUTO_INCREMENT PRIMARY KEY, location VARCHAR(255))`,
+		(err, result) => {
+			console.log("Location Table created successfully");
+		}
+	);
+	
+
+
 };
 
 createTables();

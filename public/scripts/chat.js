@@ -54,26 +54,21 @@ const userRoomInfo = JSON.parse(localStorage.getItem("room"));
 
 let roomID = userInfo.room_id;
 const userID = userInfo.id;
-console.log(roomID);
-console.log(userID);
+const userName = userInfo.username;
+
+
 
 //requiring socket io client
 const socket = io()
 
-//join the group buy the group id
+//join the group by the group id
 socket.emit("join-room", roomID);
 
 
-//alertind to the frnt end about a user joining he group
-socket.on("join-room", joinedUser =>{
-	const joinedWrapper =document.createElement('div');
-	joinedWrapper.innerHTML = `${joinedUser} joined the group`;
-	chatMessageHolder.appendChild(joinedWrapper)
-
-	console.log(joinedWrapper);
-})
 
 //previous messages display to all user in group
+
+
 socket.on("previous-message", (previouMessage) => {
 	previouMessage.message.map((prevMessage) => {
 		const newMessageWrapper = document.createElement("div");
@@ -105,12 +100,12 @@ socket.on("previous-message", (previouMessage) => {
 		chatMessageHolder.appendChild(newMessageWrapper);
 		console.log(prevMessage);
 
-		chatMessagesWrapper.scrollTo =
-			chatMessagesWrapper.scrollHeight - chatMessagesWrapper.clientHeight;
+		chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight - chatMessageHolder.clientHeight
 	});
 
-	window.scrollTo(0, document.body.scrollHeight);
 });
+
+
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -126,31 +121,18 @@ form.addEventListener("submit", (e) => {
 	}
 	messageInput.focus();
 });
-    //sending the message
-    if (messageInput.value) {
-        socket.emit("send-message", {userID, roomID, message:messageInput.value});
-        // messageInput.value = "";
-
-        console.log(messageInput.value);
-        
-    }
-    messageInput.focus();
-
-
-
 
 
 socket.on("new-message", function (newMessage) {
 	const newMessageWrapper = document.createElement("div");
 
-	console.log(newMessage);
 
-	// //adding the blue and gray background on the chat base on the if new message id match logged in user id
+	//adding the blue and gray background on the chat base on the if new message id match logged in user id
 	if (newMessage.userId === userID) {
 		newMessageWrapper.innerHTML = `
          <div class=" align-right message-top flex flex-col" id=${newMessage.userId}>
                     <div class="flex items-end">
-                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userprofile} alt="profile-image">
+                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userProfile} alt="profile-image">
                         <span class="current-user message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72 current-user-bg">${newMessage.newMessage}</span>
                     </di
                 </div>
@@ -159,7 +141,7 @@ socket.on("new-message", function (newMessage) {
 		newMessageWrapper.innerHTML = `
         <div class="message-top flex flex-col" id=${newMessage.userId}>
                    <div class="flex items-end">
-                       <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userprofile} alt="profile-image">
+                       <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userProfile} alt="profile-image">
                        <span
                         class="members message text-sm md:text-lg bg-gray-200 text-black px-7 py-2 rounded-lg max-w-72 members-bg">${newMessage.newMessage}</span>
                 </di
@@ -169,6 +151,14 @@ socket.on("new-message", function (newMessage) {
 
 	chatMessageHolder.appendChild(newMessageWrapper);
 
+	console.log("scrollhigh", chatMessagesWrapper.scrollHeight);
+	console.log("clienthigh", chatMessagesWrapper.clientHeight);
+
+	
+	
+
+	chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight - chatMessageHolder.clientHeight
+
 	// textArea.scrollHeight + "px";
 });
 
@@ -177,10 +167,10 @@ function resizeTextArea(textArea) {
 	textArea.style.height = "auto";
 	textArea.style.height = textArea.scrollHeight + "px";
 }
-messageInput.addEventListener("input", () => {
-	resizeTextArea(messageInput);
-});
+// messageInput.addEventListener("input", () => {
+// 	resizeTextArea(messageInput);
+// });
 
-document.addEventListener("DOMContentLoaded", () => {
-	resizeTextArea(messageInput);
-});
+// document.addEventListener("DOMContentLoaded", () => {
+// 	resizeTextArea(messageInput);
+// });
