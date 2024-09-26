@@ -123,15 +123,15 @@
 <body class="bg-gray-100 text-gray-900 relative">
 
 			<% if (user && hasAlerted) { %>
-			<div id="notification-icon" class=" fixed top-5 right-5 bg-red-500 text-white p-3 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
+			<div id="notification-icon" class=" fixed top-20 left-5 bg-red-500 text-white p-2 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
 			🛎️
-			<span id="notification-count" class="absolute bottom-0 left-0 bg-red-600 text-white rounded-full text-xs font-bold px-1"><%= notificationCount %></span>
+			<span id="notification-count" class="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs font-bold px-1"><%= notificationCount %></span>
 			</div>
 			<% } %>
 			<!-- Notification List -->
-			<div id="notification-list" class="hidden fixed bottom-20 right-5 bg-white border border-gray-300 rounded-lg shadow-lg p-4 max-h-[calc(100vh-100px)] overflow-y-auto w-80 mt-16">
+			<div id="notification-list" class="hidden fixed top-20 left-5 bg-white border border-gray-300 rounded-lg shadow-lg p-4 max-h-[calc(100vh-100px)] overflow-y-auto w-80 ">
 				<h4 class="font-bold mb-2 text-lg">Reported Incidents</h4>
-				<div id="incident-list" class="grid grid-cols-2 gap-4">
+				<div id="incident-list" class="grid grid-cols-1 gap-4">
 					<!-- Each incident will be inserted here -->
 				</div>
 				<button id="back-home-button" class="mt-2 bg-red-500 text-white rounded p-2 hover:bg-red-700">Back Home</button>
