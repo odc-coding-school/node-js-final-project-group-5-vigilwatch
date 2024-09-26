@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 
 router.get("/members", (req, res) => {
 	let user = req.session.user;
-	console.log(user);
+	// console.log(user);
 
 	if (!user) {
 		res.status(400).json("Session Expired");

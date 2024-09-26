@@ -15,7 +15,7 @@ const cors = require("cors");
 
 const app = express();
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -110,6 +110,92 @@ app.get("/get-reported-incidents", (req, res) => {
 	});
 });
 
+// app.post("/submit-incident", (req, res) => {
+// 	upload(req, res, async (err) => {
+// 		try {
+// 			if (err) {
+// 				return res.send("Error uploading file");
+// 			}
+
+// 			const { userId, incidentType, description, incidentDate, location } =
+// 				req.body;
+// 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+// 			// Fetching the reporter's name from users table
+// 			const userName = "SELECT full_name FROM users WHERE id = ?";
+// 			const [reporter] = await db.promise().query(userName, [userId]);
+// 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
+
+// 			// Fetch user's registered location
+// 			const userAddress = "SELECT user_address FROM users WHERE id = ?";
+// 			const [userResult] = await db.promise().query(userAddress, [userId]);
+// 			const userLocation = userResult[0] ? userResult[0].user_address : null;
+
+// 			if (userLocation && location !== userLocation) {
+// 				return res
+// 					.status(400)
+// 					.send(
+// 						"Error: The location entered doesn't match your registered location."
+// 					);
+// 			}
+
+// 			// Insert incident into the database
+// 			const incidentsInsert =
+// 				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
+// 			const values = [
+// 				incidentType,
+// 				description,
+// 				incidentDate,
+// 				location,
+// 				imagePath,
+// 			];
+
+// 			await db.promise().query(incidentsInsert, values);
+
+// 			// Send notification email
+// 			await sendNotification({
+// 				location,
+// 				description,
+// 				incidentType,
+// 				date: incidentDate,
+// 				reporterName,
+// 				image_path: imagePath,
+// 			});
+
+// 			// Increment the notification count in session
+// 			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
+
+// 			res.redirect("http://localhost:5000/incident-success");
+// 		} catch (error) {
+// 			console.error("Error reporting incident:", error);
+// 			res.status(500).json({ message: "Error reporting incident" });
+// 		}
+// 	});
+// });
+
+// to get user location
+
+app.get("/get-user-location", async (req, res) => {
+	if (!req.session.user || !req.session.user.id) {
+		return res.status(401).json({ message: "User not logged in" });
+	}
+
+	const userId = req.session.user.id;
+	const query = "SELECT user_address FROM users WHERE id = ?";
+
+	try {
+		const [result] = await db.promise().query(query, [userId]);
+		if (result.length === 0) {
+			return res.status(404).json({ message: "User location not found" });
+		}
+		const userLocation = result[0].user_address;
+		res.json({ location: userLocation });
+	} catch (err) {
+		console.error("Error fetching user location:", err);
+		res.status(500).json({ message: "Database error" });
+	}
+});
+
 app.post("/submit-incident", (req, res) => {
 	upload(req, res, async (err) => {
 		try {
@@ -119,16 +205,10 @@ app.post("/submit-incident", (req, res) => {
 
 			const { userId, incidentType, description, incidentDate, location } =
 				req.body;
-			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-
-			// Fetching the reporter's name from users table
-			const userName = "SELECT full_name FROM users WHERE id = ?";
-			const [reporter] = await db.promise().query(userName, [userId]);
-			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
 			// Fetch user's registered location
-			const userAddress = "SELECT user_address FROM users WHERE id = ?";
-			const [userResult] = await db.promise().query(userAddress, [userId]);
+			const userQuery = "SELECT user_address FROM users WHERE id = ?";
+			const [userResult] = await db.promise().query(userQuery, [userId]);
 			const userLocation = userResult[0] ? userResult[0].user_address : null;
 
 			if (userLocation && location !== userLocation) {
@@ -139,7 +219,8 @@ app.post("/submit-incident", (req, res) => {
 					);
 			}
 
-			// Insert incident into the database
+			// Proceed with inserting the incident
+			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 			const incidentsInsert =
 				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
 			const values = [
@@ -152,20 +233,10 @@ app.post("/submit-incident", (req, res) => {
 
 			await db.promise().query(incidentsInsert, values);
 
-			// Send notification email
-			await sendNotification({
-				location,
-				description,
-				incidentType,
-				date: incidentDate,
-				reporterName,
-				image_path: imagePath,
-			});
-
 			// Increment the notification count in session
 			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
 
-			res.redirect("http://localhost:5000/incident-success");
+			res.redirect("/incident-success");
 		} catch (error) {
 			console.error("Error reporting incident:", error);
 			res.status(500).json({ message: "Error reporting incident" });
@@ -340,9 +411,9 @@ const io = setupSocketIO(server);
 app.get("/chat", (req, res) => {
 	const roomID = req.session.user.room_id;
 	const userID = req.session.user.id;
-	const userName = req.session.user.name
+	const userName = req.session.user.name;
 
-	
+
 	const user = req.session.user || null;
 	res.render("chat", { user, isRegistered: !!req.session.user });
 });
