@@ -1,23 +1,32 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Chat</title>
-		<link rel="stylesheet" href="/css/styles.css" />
-		<link rel="stylesheet" href="/css/extra-style.css" />
-        <% if(user) {%>
-            <script src="/socket.io/socket.io.js"></script>
-			<script src="../scripts/chat.js" defer></script>
-		<%}%>
-	</head>
 
-	<body class="flex flex-col h-screen bg-neutral-900">
-		<!-- Header -->
-		<%- include('includes/header') %>
-		<!-- header end -->
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/extra-style.css" />
+    <% if(user) {%>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../scripts/chat.js" defer></script>
+        <%}%>
 
-        <main class="chat-box bg-gray-100 p-4 flex-grow flex mt-24 fixed right-20 left-20 bottom-0 top-0">
+
+            <style>
+                .chat-message-holder {
+                    border-radius: 10px;
+                }
+            </style>
+
+</head>
+
+<body class="flex flex-col h-screen bg-neutral-900 bg-opacity-80">
+    <!-- Header -->
+    <%- include('includes/header') %>
+        <!-- header end -->
+
+        <main class="chat-box bg-gray-100 p-4 flex-grow flex mt-24 fixed right-20 left-20 bottom-0 top-0 rounded-lg">
             <a href="./" class="fixed">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
                     class="bi bi-backspace" viewBox="0 0 16 16">
@@ -40,61 +49,52 @@
 
                 <div class="group-members h-72  overflow-auto">
 
-                    <div class="member-wrapper flex items-center hover:bg-gray-600 cursor-pointer mt-5">
+                    <!-- <div class="member-wrapper flex items-center hover:bg-gray-600 cursor-pointer mt-5">
                         <img class="profile w-10 h-10 rounded-full object-cover mr-3" src="../profile.jpg"
                             alt="profile-image">
                         <span class="member font-semibold">Abraham Dukuly</span>
-                    </div>
+                    </div> -->
                 </div>
 
             </aside>
 
 
 
-            <section class="chat-message flex-1 p-2.5 overflow-auto h-80 overflow-x-hidden">
-                <section class="chat-message-holder ml-10">
+            <section class="chat-message flex-1 p-2.5 pb-5 overflow-auto h-72 overflow-x-hidden">
+                <section class="chat-message-holder ml-10 rounded-md">
                     <div class="message-top flex flex-col">
-                        <div class="flex items-end">
+                        <!-- <div class="flex items-end">
                             <img class="w-10 h-10 rounded-full object-cover mr-3" src="../profile.jpg"
                                 alt="profile-image">
                             <span
                                 class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">Lorem
                                 ipsum dolor sit, non?</span>
-                        </div>
+                        </div> -->
                         <!-- <div class="timestamp text-gray-400">1 hour ago</div> -->
                     </div>
 
                 </section>
 
 
-				<!-- <div
-                    class="wrapper message-button-wrapper flex rounded-2xl font-semibold font-sans border border-gray-500">
-
-                </div> -->
-
-
 
                 <form id="form" class="fixed top-20">
                     <div class="input-wrapper">
-    
-                        <textarea
-                        id="input-field"
-                        cols="2"
-                        class="w-full border border-gray-300 rounded-lg input-field px-3 pt-5"
-                        placeholder="Type something...."
-                    ></textarea>
-    
-    
+
+                        <textarea id="input-field" cols="2"
+                            class="w-full border border-gray-300 rounded-lg input-field px-3 pt-5"
+                            placeholder="Type something...."></textarea>
+
+
                         <button id="send-btn" class="text-lg p-2 bg-blue-700
                         border-none text-white rounded-lg cursor-pointer mr-20">
-    
+
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
                                 class="bi bi-send-fill" viewBox="0 0 16 16">
                                 <path
                                     d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
                             </svg>
                         </button>
-    
+
                     </div>
 
                 </form>

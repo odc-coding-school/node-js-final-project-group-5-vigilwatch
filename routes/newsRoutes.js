@@ -65,10 +65,11 @@ router.get("/:id", (req, res)=>{
 		// if(specificNews.length === 0) return res.status(409).render("singleNew", {error});
 
 		console.log(specificNews);
+
 		
 		
 	
-		 res.render("singleNew", {url:`http://localhost:5000/news/${specificNews[0].id}`, specificNews, user, isRegistered: !!req.session.user });
+		res.render("singleNew", {url:`http://localhost:5000/news/${specificNews[0].id}`, specificNews, user, isRegistered: !!req.session.user });
 	})
 
 })
