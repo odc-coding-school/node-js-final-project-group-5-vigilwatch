@@ -17,9 +17,6 @@ db.connect(function (err) {
 	console.log("database connected");
 });
 
-
-
-
 const createTables = () => {
 	const createUsersTable = `
         CREATE TABLE IF NOT EXISTS users (
@@ -38,16 +35,15 @@ const createTables = () => {
 
 	db.query(createUsersTable, (error, result) => {
 		if (error) {
-			console.log(" creating users table");
+			console.log("error creating users table");
 		} else {
 			console.log("Users table created or already exists");
 		}
 	});
 
-
 	// Incident query
 	const createIncidentsTable = `
-		CREATE TABLE incidents (
+		CREATE TABLE IF NOT EXISTS incidents (
 			id INT AUTO_INCREMENT PRIMARY KEY,
 			incident_type VARCHAR(50) NOT NULL,
 			description TEXT NOT NULL,
@@ -55,22 +51,21 @@ const createTables = () => {
 			location VARCHAR(255) NOT NULL,
 			image_path VARCHAR(255),
 			location_lat DECIMAL(10, 8),
-			location_lng DECIMAL(11, 8);
+			location_lng DECIMAL(11, 8),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
-		);
+		)
 `;
 
-db.query(createIncidentsTable, (error, result) => {
-	if (error) {
-		console.log(" creating incidents table");
-	} else {
-		console.log("Incidents table created or already exists");
-	}
-});
+	db.query(createIncidentsTable, (error, result) => {
+		if (error) {
+			console.log("error creating incidents table");
+		} else {
+			console.log("Incidents table created or already exists");
+		}
+	});
 
-
-//Message table query
+	//Message table query
 	const message_table = `
 	CREATE TABLE IF NOT EXISTS messages
 		(message_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, room_id INT, 
@@ -78,7 +73,6 @@ db.query(createIncidentsTable, (error, result) => {
 		FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (room_id) REFERENCES room(room_id))
 	`;
 
-	
 	db.query(message_table, (error, result) => {
 		if (error) {
 			console.error("Error creating users table: ", error);
@@ -101,7 +95,7 @@ db.query(createIncidentsTable, (error, result) => {
 		}
 	});
 
-		// Location query 
+	// Location query
 	db.query(
 		`INSERT INTO location (id, location) VALUES(DEFAULT, "Sinkor"),(DEFAULT, "West Point"),
 		(DEFAULT, "New Kru Town"), (DEFAULT, "Congo Town"), (DEFAULT, "Paynesville"), (DEFAULT, "Clara Town"),
@@ -114,7 +108,7 @@ db.query(createIncidentsTable, (error, result) => {
 		`,
 		(err, result) => {
 			if (err) return console.log(err.message);
-	
+
 			console.log("Insert into the location table successful");
 		}
 	);
@@ -126,9 +120,6 @@ db.query(createIncidentsTable, (error, result) => {
 			console.log("Location Table created successfully");
 		}
 	);
-	
-
-
 };
 
 createTables();

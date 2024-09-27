@@ -429,18 +429,15 @@ app.get("/chat", (req, res) => {
 	const userID = req.session.user.id;
 	const userName = req.session.user.name;
 
-
 	const user = req.session.user || null;
 	res.render("chat", { user, isRegistered: !!req.session.user });
 });
 
 // Handle socket connection inside the chat route
 io.on("connection", (socket) => {
-
 	// Join the group by the group ID
-	socket.on("join-room", roomID =>{
+	socket.on("join-room", (roomID) => {
 		socket.join(roomID);
-
 
 		// fetching existing messages from the mrssage table
 		const query = `
@@ -478,13 +475,8 @@ io.on("connection", (socket) => {
 		});
 	});
 
-
-
-
-
 	// Sending messages to all members
 	socket.on("send-message", (data) => {
-		
 		const query =
 			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
 		db.query(query, [data.userID, data.roomID, data.message], (err) => {
@@ -494,8 +486,6 @@ io.on("connection", (socket) => {
 				"SELECT users.id, users.profilePic FROM users WHERE id = ?";
 			db.query(profileQuery, [data.userID], (err, userProfile) => {
 				if (err) throw err;
-
-				
 
 				// Emit new message to all members except the sender
 				socket.to(data.roomID).emit("new-message", {
@@ -512,11 +502,8 @@ io.on("connection", (socket) => {
 					newMessage: data.message,
 					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
 				});
-
 			});
 		});
-
-		
 	});
 
 	// Handle user disconnection
