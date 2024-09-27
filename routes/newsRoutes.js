@@ -2,7 +2,19 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 const {formatDistanceToNow} = require("date-fns")
+const axios = require('axios');
+const cheerio = require("cheerio");
 
+
+const scrapeNew = async()=>{
+	const url = "https://www.frontpageafricaonline.com";
+	const {data} = await axios.get(url);
+	const cheerioInstance = cheerio.load(data);
+	const newItemGroup =[] ;
+	console.log(data)
+}
+
+scrapeNew()
 
 
 

@@ -68,6 +68,8 @@ socket.emit("join-room", roomID);
 
 //previous messages display to all user in group
 
+// <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
+
 
 socket.on("previous-message", (previouMessage) => {
 	previouMessage.message.map((prevMessage) => {
@@ -76,29 +78,36 @@ socket.on("previous-message", (previouMessage) => {
 		//adding the blue and gray background on the chat base on the id
 		if (prevMessage.id === userID) {
 			newMessageWrapper.innerHTML = `
-             <div class="message-top flex flex-col align-right" id=${prevMessage.id}>
-                        <div class="flex items-end">
-                            <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
-                            <span
-                                class="current-user-bg message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}</span>
-                        </div>
-                        <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
+             	<div class="message-top flex flex-col align-right mb-5" id=${prevMessage.id}>
+			 		<span class="username text-gray-600 font-thin text-sm text-center">${prevMessage.fullName}</span>
+
+                    <div class="flex items-end">
+                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
+                        <span
+                        class="current-user-bg message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}</span>
                     </div>
+					<div class="timestamp text-gray-400 text-sm">${prevMessage.messageTime}</div>
+
+				</div>
             `;
 		} else {
 			newMessageWrapper.innerHTML = `
-            <div class="message-top flex flex-col" id=${prevMessage.id}>
-                       <div class="flex items-end">
-                           <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
+             	<div class="message-top flex flex-col mb-5" id=${prevMessage.id}>
+			 		<span class="username text-gray-600 font-thin text-sm text-left">${prevMessage.fullName}</span>
+
+                    <div class="flex items-end">
+                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${prevMessage.profile} alt="profile-image">
                         <span
-                            class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72 members-bg">${prevMessage.messageType}</span>
-                       </div>
-                       <div class="timestamp text-gray-400">${prevMessage.messageTime}</div>
-                   </div>
-           `;
-		}
+                        class="members-bg message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72">${prevMessage.messageType}</span>
+                    </div>
+					<div class="timestamp text-gray-400 text-sm">${prevMessage.messageTime}</div>
+
+				</div>
+            `;
+		};
+
+
 		chatMessageHolder.appendChild(newMessageWrapper);
-		console.log(prevMessage);
 
 		chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight - chatMessageHolder.clientHeight
 	});
@@ -108,7 +117,7 @@ socket.on("previous-message", (previouMessage) => {
 
 
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
+	e.preventDefault();
 
 	//sending the message
 	if (messageInput.value) {
@@ -123,39 +132,45 @@ form.addEventListener("submit", (e) => {
 });
 
 
+
 socket.on("new-message", function (newMessage) {
 	const newMessageWrapper = document.createElement("div");
+	console.log(newMessage);
+
 
 
 	//adding the blue and gray background on the chat base on the if new message id match logged in user id
 	if (newMessage.userId === userID) {
 		newMessageWrapper.innerHTML = `
-         <div class=" align-right message-top flex flex-col" id=${newMessage.userId}>
-                    <div class="flex items-end">
-                        <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userProfile} alt="profile-image">
-                        <span class="current-user message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-lg max-w-72 current-user-bg">${newMessage.newMessage}</span>
-                    </di
+          	<div class="message-top flex flex-col align-right ${newMessage.id}">
+                <div class="flex items-end flex-col">
+					<span class="username text-gray-600 font-thin text-sm text-center">${newMessage.userName}</span>
+						
+					<div class="flex items-center">
+						<img class="w-10 h-10 rounded-full object-cover mr-3" src="${newMessage.userProfile}" alt="profile-image">
+                        <div class="message current-user-bg text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-2xl max-w-72">${newMessage.newMessage}</div>
+                    </div>
                 </div>
+            
+            </div>
         `;
 	} else {
 		newMessageWrapper.innerHTML = `
-        <div class="message-top flex flex-col" id=${newMessage.userId}>
-                   <div class="flex items-end">
-                       <img class="w-10 h-10 rounded-full object-cover mr-3" src=${newMessage.userProfile} alt="profile-image">
-                       <span
-                        class="members message text-sm md:text-lg bg-gray-200 text-black px-7 py-2 rounded-lg max-w-72 members-bg">${newMessage.newMessage}</span>
-                </di
+          	<div class="message-top flex flex-col items-start ${newMessage.id}">
+                <div class="flex items-end flex-col">
+					<span class="username text-gray-600 font-thin text-sm text-center">${newMessage.userName}</span>
+						
+					<div class="flex items-center">
+						<img class="w-10 h-10 rounded-full object-cover mr-3" src="${newMessage.userProfile}" alt="profile-image">
+                        <div class="message members-bg text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-2xl max-w-72">${newMessage.newMessage}</div>
+                    </div>
+                </div>
+            
             </div>
-       `;
+        `;
 	}
 
 	chatMessageHolder.appendChild(newMessageWrapper);
-
-	console.log("scrollhigh", chatMessagesWrapper.scrollHeight);
-	console.log("clienthigh", chatMessagesWrapper.clientHeight);
-
-	
-	
 
 	chatMessageHolder.scrollTo = chatMessageHolder.scrollHeight - chatMessageHolder.clientHeight
 

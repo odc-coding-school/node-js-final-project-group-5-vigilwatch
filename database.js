@@ -65,6 +65,28 @@ const createTables = () => {
 		}
 	});
 
+	// New query
+	const createNewsTable = `
+		CREATE TABLE IF NOT EXISTS news (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			link VARCHAR(50) NOT NULL,
+			title TEXT NOT NULL,
+			image VARCHAR(255) NOT NULL,
+			content VARCHAR(255) NOT NULL,
+			location VARCHAR(55) NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+		);
+`;
+
+	db.query(createNewsTable, (error, result) => {
+		if (error) {
+			console.log(error);
+		} else {
+			console.log("News table created or already exists");
+		}
+	});
+
 	//Message table query
 	const message_table = `
 	CREATE TABLE IF NOT EXISTS messages

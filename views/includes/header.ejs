@@ -12,13 +12,20 @@
                 <li><a href="/report" class="hover:underline">Report Incident</a></li>
                 <li><a href="/analytics" class="hover:underline">Analytics</a></li>
                 <li><a href="/news" class="hover:underline">News</a></li>
+                <%if(isRegistered) { %>
+                    <li><a href="/logout" class="hover:underline">Logout</a></li>
+                <% } else {%>
+                    <li><a href="/login" class="hover:underline">Login</a></li>
+               <% }%>
+            </ul>
 
 
+            <div class="toggleHeader flex items-center justify-center">
                 <% if (isRegistered) { %>
-                    <li class="relative">
+                    <li class="relative list-none">
 
                         <button id="profile-menu-btn" class="flex items-center focus:outline-none">
-                            <img src="<%= user && user.profilePic ? user.profilePic : '/user-solid.svg' %>"
+                            <img src="<%= user.profilePic ? user.profilePic : '/uploads/user-solid.svg' %>"
                                 alt="Profile" class="w-10 h-10 rounded-full border-4 border-gray-500">
                         </button>
 
@@ -46,51 +53,10 @@
                             </ul>
                         </div>
                     </li>
-                    <% } else { %>
-                        <li><a href="/login" class="hover:underline">Login</a></li>
-                        <% } %>
-            </ul>
+                    <% }%>
+                        
 
-
-            <div class="toggleHeader md:hidden flex items-center justify-center">
-
-                <li class="relative list-none">
-
-                    <button id="profile-menu-btn" class="flex items-center focus:outline-none">
-                        <img src="<%= isRegistered ? user.profilePic : '/user-solid.svg' %>"
-                            alt="Profile" class="w-10 h-10 rounded-full border-4 border-gray-500 text-white">
-                    </button>
-
-                    <%if(isRegistered) {%>
-
-                        <div id="profile-menu"
-                            class="absolute right-0 mt-2 w-52 bg-red-600 rounded-lg shadow-lg hidden z-20">
-                            <h1 class="px-4 py-2 text-white">Welcome <%= user && user.name %>
-                            </h1>
-                            <ul class="py-1 flex flex-col">
-                                <li>
-                                    <form action="/user/upload-profile" method="POST" enctype="multipart/form-data"
-                                        class="px-4 py-2">
-                                        <input type="file" name="profilePic" accept="image/*"
-                                            class="mb-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
-                                        <button type="submit"
-                                            class="block w-full text-cente text-white bg-red-700 hover:bg-red-800">Upload
-                                            Profile</button>
-                                    </form>
-                                </li>
-                                <li class="w-full">
-                                    <form action="/logout" method="POST" class="block w-full px-4 py-2">
-                                        <button type="submit"
-                                            class=" block w-full text-center text-white bg-red-700 hover:bg-red-800">Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    <%}%>
-
-                </li>
-
-                <div class="menu">
+                <div class="menu md:hidden">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
                         viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
