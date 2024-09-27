@@ -18,7 +18,11 @@ const sendNotification = async ({
 }) => {
 	const mailOptions = {
 		from: process.env.USER_EMAIL,
-		to: ["torhshad09@gmail.com", "adukuly461@gmail.com"],
+		to: [
+			"torhshad09@gmail.com",
+			"adukuly461@gmail.com",
+			"princessangelvahn1@gmail.com",
+		],
 		subject: "New Incident Reported",
 		text:
 			`${reporterName} just reported an incident:\n\n` +

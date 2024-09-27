@@ -210,6 +210,9 @@ app.post("/submit-incident", (req, res) => {
 			const userQuery = "SELECT user_address FROM users WHERE id = ?";
 			const [userResult] = await db.promise().query(userQuery, [userId]);
 			const userLocation = userResult[0] ? userResult[0].user_address : null;
+			const nameQuery = "SELECT full_name FROM users WHERE id = ?";
+			const [reporter] = await db.promise().query(nameQuery, [userId]);
+			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
 			if (userLocation && location !== userLocation) {
 				return res
@@ -233,6 +236,15 @@ app.post("/submit-incident", (req, res) => {
 
 			await db.promise().query(incidentsInsert, values);
 
+			sendNotification({
+				reporterName,
+				location,
+				description,
+				incidentType,
+				date: incidentDate,
+				image_path: imagePath,
+			});
+
 			// Increment the notification count in session
 			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
 
@@ -246,6 +258,7 @@ app.post("/submit-incident", (req, res) => {
 
 app.post("/send-message", (req, res) => {
 	const { name, email, message } = req.body;
+	const user = req.session.user || null;
 
 	if (!email || !name || !message) {
 		return res.status(400).send("All fields are required.");
@@ -278,7 +291,10 @@ app.post("/send-message", (req, res) => {
 		}
 		console.log("Email sent:", info.response);
 		res.redirect(
-			"http://localhost:5000/success?msg=Your message has been sent! We'll get back to you shortly."
+			"http://localhost:5000/success?msg=Your message has been sent! We'll get back to you shortly.",
+			{
+				user,
+			}
 		);
 	});
 });
