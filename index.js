@@ -433,11 +433,11 @@ io.on("connection", (socket) => {
 			m.user_id, m.room_id, m.message_type, m.messaged_time
 			FROM users AS u
 			JOIN messages AS m ON (m.user_id = u.id)
-			WHERE m.room_id = ?
+			WHERE m.room_id = ? ORDER BY m.messaged_time ASC
 		`;
 		db.query(query, [roomID], (err, previousMessages) => {
 			if (err) throw err;
-
+			
 			let existingMessages = { message: [] };
 			previousMessages.forEach((prevMessage) => {
 				const messagedTime = new Date(prevMessage.messaged_time);
@@ -455,6 +455,7 @@ io.on("connection", (socket) => {
 					userId: prevMessage.user_id,
 					profile: prevMessage.user_profile,
 				});
+			
 			});
 
 			// Emit previous messages to the user
@@ -475,11 +476,9 @@ io.on("connection", (socket) => {
 			if (err) return res.json(err.message);
 
 			const profileQuery =
-				"SELECT users.id, users.profilePic FROM users WHERE id = ?";
+				"SELECT users.id, users.profilePic, users.full_name FROM users WHERE id = ?";
 			db.query(profileQuery, [data.userID], (err, userProfile) => {
 				if (err) throw err;
-
-				
 
 				// Emit new message to all members except the sender
 				socket.to(data.roomID).emit("new-message", {
@@ -487,7 +486,10 @@ io.on("connection", (socket) => {
 					roomId: data.roomID,
 					newMessage: data.message,
 					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
+					userName: userProfile[0].full_name
 				});
+
+				
 
 				//Emit new message to the senders
 				socket.emit("new-message", {
@@ -495,6 +497,7 @@ io.on("connection", (socket) => {
 					roomId: data.roomID,
 					newMessage: data.message,
 					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
+					userName: userProfile[0].full_name
 				});
 
 			});

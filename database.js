@@ -55,7 +55,7 @@ const createTables = () => {
 			location VARCHAR(255) NOT NULL,
 			image_path VARCHAR(255),
 			location_lat DECIMAL(10, 8),
-			location_lng DECIMAL(11, 8);
+			location_lng DECIMAL(11, 8),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 		);
@@ -66,6 +66,28 @@ db.query(createIncidentsTable, (error, result) => {
 		console.log(" creating incidents table");
 	} else {
 		console.log("Incidents table created or already exists");
+	}
+});
+
+	// New query
+	const createNewsTable = `
+		CREATE TABLE IF NOT EXISTS news (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			link VARCHAR(50) NOT NULL,
+			title TEXT NOT NULL,
+			image VARCHAR(255) NOT NULL,
+			content VARCHAR(255) NOT NULL,
+			location VARCHAR(55) NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+		);
+`;
+
+db.query(createNewsTable, (error, result) => {
+	if (error) {
+		console.log(error);
+	} else {
+		console.log("News table created or already exists");
 	}
 });
 
