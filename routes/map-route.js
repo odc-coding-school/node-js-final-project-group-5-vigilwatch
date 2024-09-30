@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database.js");
-const axios = require("axios");
 
 
 router.get('/', async (req, res) => {

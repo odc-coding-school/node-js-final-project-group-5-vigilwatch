@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="/css/styles.css" />
+	</head>
+	<body>
+		<!-- Header -->
+		<%- include('includes/header') %>
+		<!-- header end -->
+		<div class="container mx-auto p-6 mt-20"></div>
+	<div
+		class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
+	>
+		<div class="md:flex">
+			<!-- Profile Picture -->
+			<div class="md:flex-shrink-0">
+				<img
+					class="w-20 h-20 rounded-full border-4 border-gray-500 hover:scale-105 transition duration-300 cursor-pointer"
+					src="<%= user.profilePic ? user.profilePic : '/default-avatar.png' %>"
+					alt="Profile Picture"
+				/>
+			</div>
+
+			<!-- User Information -->
+			<div class="p-8">
+				<h2
+					class="block mt-1 text-lg leading-tight font-semibold text-gray-900"
+				>
+					<%= user.full_name %>
+				</h2>
+				<p class="mt-2 text-gray-600">
+					Location: <%= user.user_address ? user.user_address : 'Not specified'
+					%>
+				</p>
+
+				<!-- Incident Stats -->
+				<div class="mt-4">
+					<div class="flex items-center justify-between">
+						<div class="text-sm text-gray-600">Reported Incidents:</div>
+						<div class="text-lg font-semibold text-gray-800">
+							<%= reportedCount %>
+						</div>
+					</div>
+					<div class="flex items-center justify-between mt-2">
+						<div class="text-sm text-gray-600">Pending Incidents:</div>
+						<div class="text-lg font-semibold text-gray-800">
+							<%= pendingCount %>
+						</div>
+					</div>
+				</div>
+				<!-- back home -->
+				<div class="text-center mt-4">
+					<a href="/" class="text-red-500 underline mt-4">Back to Home</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	</body>
+</html>
+
+

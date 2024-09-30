@@ -5,11 +5,10 @@ const fs = require("fs");
 const db = require("../database.js");
 const router = express.Router();
 
-// this  Configure multer storage
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		const uploadFolder = "public/uploads";
-		// Check if the directory exists, if not create it
+
 		if (!fs.existsSync(uploadFolder)) {
 			fs.mkdirSync(uploadFolder, { recursive: true });
 		}

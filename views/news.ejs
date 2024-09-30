@@ -4,59 +4,53 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Incident Reports</title>
+	<title>News Center</title>
 	<link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body class="bg-gray-100">
 	<!-- header -->
 	<%- include('includes/header') %>
-		<!-- header end -->
+	<!-- header end -->
 
-		<h2 class="mt-4 text-3xl font-bold mb-8 text-center">News Center</h2>
+	<div class="container mx-auto p-6 bg-white rounded-lg shadow-md max-w-4xl mt-24 mb-10">
+		
+	<h2 class="mt-4 text-3xl font-bold mb-8 text-center">News Center</h2>
 
-		<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+	<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+		<!-- Loop through each news item -->
+		<% modifiedNews.forEach(news => { %>
+			<div class="card">
+				<!-- News Card -->
+				<div class="bg-white rounded-lg shadow-md overflow-hidden">
+					<img class="w-full h-32 object-cover" src="<%= news.image %>" alt="News Image" />
 
-			<% modifiedNews.forEach(news=>{%>
-				<div class="card">
-					<!-- Card 1 -->
-					<div class="bg-white rounded-lg shadow-md overflow-hidden">
-
-
-						<img class="w-full h-32 object-cover" src="<%=news.imagePath %>" alt="Incident Image" />
-						<div class="p-3">
-							<div class="flex justify-between items-center">
-								<h2
-									class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
-									<%=news.description%>
-								</h2>
-								<p class="text-xs text-gray-500">
-									<%=news.incidentDate%>
-								</p>
-							</div>
-							<p class="text-gray-600 text-xs">
-								<%=news.location%>
+					<div class="p-3">
+						<div class="flex justify-between items-center">
+							<h2 class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+								<%= news.content %>
+							</h2>
+							<p class="text-xs text-gray-500">
+								<%= new Date(news.created_at).toLocaleDateString() %>
 							</p>
-							<p class="mt-1 text-gray-700 text-sm text-ellipsis">
-								
-							</p>
-							<a href="/news/<%=news.id %>"
-								class="block mt-3 bg-red-500 text-white text-center py-1 rounded hover:bg-red-600 text-sm">
-								<button class="viewmore-btn">View more</button></a>
 						</div>
+						<p class="text-gray-600 text-xs">
+							<%= news.location %>
+						</p>
+						<a href="/news/<%= news.id %>" class="block mt-3 bg-red-500 text-white text-center py-1 rounded hover:bg-red-600 text-sm">
+							<button class="viewmore-btn">View more</button>
+						</a>
 					</div>
-
-
-
 				</div>
+			</div>
+		<% }) %>
+	</article>
+	</div>
 
-				<%})%>
 
-		</article>
-
-		<!-- footer -->
-		<%- include('includes/footer') %>
-			<!-- footer end -->
+	<!-- footer -->
+	<%- include('includes/footer') %>
+	<!-- footer end -->
 </body>
 
 </html>

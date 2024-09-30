@@ -70,6 +70,8 @@ const policyRoutes = require("./routes/policyRoutes");
 const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
 const loginUserRoute = require("./routes/api.js");
 const incidentSuccessRoutes = require("./routes/incidentSuccessRoutes");
+const registeredUsers = require("./middleware/auth");
+const isAdmin = require("./middleware/isAdmin");
 const mapRoute = require("./routes/map-route.js");
 
 app.use("/", homeRoutes);
@@ -80,12 +82,193 @@ app.use("/report", reportRoutes);
 app.use("/location", locationRoutes);
 app.use("/api", loginUserRoute);
 app.use("/analytics", analyticsRoutes);
-app.use("/news", newsRoutes);
+app.use("/", newsRoutes);
 app.use("/policy", policyRoutes);
 app.use("/termsOfService", termsOfServiceRoutes);
 app.use("/incident-success", incidentSuccessRoutes);
-app.use("/map", mapRoute)
+app.use('/map', mapRoute);
 
+// news route
+
+// Route to get specific news item by id
+app.get("/news/:id", async (req, res) => {
+	const user = req.session.user || null;
+	const newsId = req.params.id;
+
+	try {
+		const [news] = await db
+			.promise()
+			.query("SELECT * FROM news WHERE id = ?", [newsId]);
+
+		if (news.length > 0) {
+			// If news item is found, render a template with the news details
+			res.render("singleNew", { news: news[0], user });
+		} else {
+			// If no news found, send a 404 response
+			res.status(404).send("News not found");
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Server Error");
+	}
+});
+
+app.get("/news", async (req, res) => {
+	const user = req.session.user || null;
+	try {
+		// Fetching the news from the database
+		const [news] = await db
+			.promise()
+			.query("SELECT * FROM news ORDER BY created_at DESC");
+
+		// Rendering the news view and pass the news data to the template file
+		res.render("news", { modifiedNews: news, user });
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Server Error");
+	}
+});
+
+// Route to fetch and display the news
+app.get("/admin/news/import", isAdmin, (req, res) => {
+	const user = req.session.user || null;
+	res.render("importNews", { user }); // Render the news page
+});
+// news end
+// app.get("/user/profile", registeredUsers, async (req, res) => {
+// 	const userId = req.session.user.id;
+
+// 	try {
+// 		// Fetch user data
+// 		const [user] = await db
+// 			.promise()
+// 			.query(
+// 				"SELECT full_name, profilePic, user_address FROM users WHERE id = ?",
+// 				[userId]
+// 			);
+
+// 		// Count reported incidents
+// 		const [reportedIncidents] = await db
+// 			.promise()
+// 			.query(
+// 				"SELECT COUNT(*) as count FROM incidents WHERE userId = ? AND status = 'confirmed'",
+// 				[userId]
+// 			);
+// 		console.log(
+// 			`Reported Incidents for userId ${userId}:`,
+// 			reportedIncidents[0].count
+// 		);
+
+// 		// Count pending incidents
+// 		const [pendingIncidents] = await db
+// 			.promise()
+// 			.query(
+// 				"SELECT COUNT(*) as count FROM incidents WHERE userId = ? AND status = 'pending'",
+// 				[userId]
+// 			);
+// 		console.log(
+// 			`Pending Incidents for userId ${userId}:`,
+// 			pendingIncidents[0].count
+// 		);
+
+// 		// Send JSON response
+// 		res.json({
+// 			user: user[0],
+// 			reportedCount: reportedIncidents[0].count,
+// 			pendingCount: pendingIncidents[0].count,
+// 		});
+// 	} catch (error) {
+// 		console.error(error);
+// 		res.status(500).send("Server Error");
+// 	}
+// });
+
+app.get("/user/profile", registeredUsers, async (req, res) => {
+	const userId = req.session.user.id;
+
+	try {
+		// Fetch user data
+		const [user] = await db
+			.promise()
+			.query(
+				"SELECT full_name, profilePic, user_address FROM users WHERE id = ?",
+				[userId]
+			);
+
+		// Count reported incidents
+		const [reportedIncidents] = await db
+			.promise()
+			.query(
+				"SELECT COUNT(*) as count FROM incidents WHERE userId = ? AND status = 'confirmed'",
+				[userId]
+			);
+
+		// Count pending incidents
+		const [pendingIncidents] = await db
+			.promise()
+			.query(
+				"SELECT COUNT(*) as count FROM incidents WHERE userId = ? AND status = 'pending'",
+				[userId]
+			);
+
+		// Render the user profile using EJS
+		res.render("profile", {
+			user: user[0],
+			reportedCount: reportedIncidents[0].count,
+			pendingCount: pendingIncidents[0].count,
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Server Error");
+	}
+});
+
+//admin route
+app.get("/admin", isAdmin, (req, res) => {
+	const user = req.session.user || null;
+	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
+	const incidentQuery = "SELECT * FROM incidents"; // All incidents
+
+	db.query(userQuery, (err, users) => {
+		if (err) return res.status(500).send("Error retrieving users.");
+
+		db.query(incidentQuery, (err, incidents) => {
+			if (err) return res.status(500).send("Error retrieving incidents.");
+
+			res.render("admin", { users, incidents, user });
+		});
+	});
+});
+
+app.post("/admin/promote", isAdmin, (req, res) => {
+	const userId = req.body.userId;
+	const query = "UPDATE users SET role = 1 WHERE id = ?";
+
+	db.query(query, [userId], (err, result) => {
+		if (err) return res.status(500).send("Error promoting user to admin.");
+		res.redirect("/admin");
+	});
+});
+
+app.post("/admin/confirm-incident", isAdmin, (req, res) => {
+	const incidentId = req.body.incidentId;
+	const query = "UPDATE incidents SET status = 'confirmed' WHERE id = ?";
+
+	db.query(query, [incidentId], (err, result) => {
+		if (err) return res.status(500).send("Error confirming incident.");
+		res.redirect("/admin");
+	});
+});
+
+app.post("/admin/delete-incident", isAdmin, (req, res) => {
+	const incidentId = req.body.incidentId;
+	const query = "DELETE FROM incidents WHERE id = ?";
+
+	db.query(query, [incidentId], (err, result) => {
+		if (err) return res.status(500).send("Error deleting incident.");
+		res.redirect("/admin");
+	});
+});
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
 	res.render("errorEmail", { msg });
@@ -103,75 +286,12 @@ app.post("/disable-alert", (req, res) => {
 
 // Get Reported Incidents
 app.get("/get-reported-incidents", (req, res) => {
-	const query = "SELECT * FROM incidents"; // Adjust the query as needed
+	const query = "SELECT * FROM incidents WHERE status = 'confirmed'"; // Adjust the query as needed
 	db.query(query, (err, results) => {
 		if (err) throw err;
 		res.json({ incidents: results });
 	});
 });
-
-// app.post("/submit-incident", (req, res) => {
-// 	upload(req, res, async (err) => {
-// 		try {
-// 			if (err) {
-// 				return res.send("Error uploading file");
-// 			}
-
-// 			const { userId, incidentType, description, incidentDate, location } =
-// 				req.body;
-// 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-
-// 			// Fetching the reporter's name from users table
-// 			const userName = "SELECT full_name FROM users WHERE id = ?";
-// 			const [reporter] = await db.promise().query(userName, [userId]);
-// 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
-
-// 			// Fetch user's registered location
-// 			const userAddress = "SELECT user_address FROM users WHERE id = ?";
-// 			const [userResult] = await db.promise().query(userAddress, [userId]);
-// 			const userLocation = userResult[0] ? userResult[0].user_address : null;
-
-// 			if (userLocation && location !== userLocation) {
-// 				return res
-// 					.status(400)
-// 					.send(
-// 						"Error: The location entered doesn't match your registered location."
-// 					);
-// 			}
-
-// 			// Insert incident into the database
-// 			const incidentsInsert =
-// 				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
-// 			const values = [
-// 				incidentType,
-// 				description,
-// 				incidentDate,
-// 				location,
-// 				imagePath,
-// 			];
-
-// 			await db.promise().query(incidentsInsert, values);
-
-// 			// Send notification email
-// 			await sendNotification({
-// 				location,
-// 				description,
-// 				incidentType,
-// 				date: incidentDate,
-// 				reporterName,
-// 				image_path: imagePath,
-// 			});
-
-// 			// Increment the notification count in session
-// 			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
-
-// 			res.redirect("http://localhost:5000/incident-success");
-// 		} catch (error) {
-// 			console.error("Error reporting incident:", error);
-// 			res.status(500).json({ message: "Error reporting incident" });
-// 		}
-// 	});
-// });
 
 // to get user location
 
@@ -235,12 +355,12 @@ app.post("/submit-incident", async (req, res) => {
 			if (result.length !== 0) {
 				const location_lat = result.results[0].geometry.lat;
 				const location_lng = result.results[0].geometry.lng;
-				
+
 				// // Proceed with inserting the incident
 				const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-	
-	
-	
+
+
+
 				const incidentsInsert =
 					"INSERT INTO incidents (incident_type, description, incident_date, location, image_path, location_lat, location_lng) VALUES (?, ?, ?, ?, ?, ?, ?)";
 				const values = [
@@ -249,10 +369,10 @@ app.post("/submit-incident", async (req, res) => {
 					incidentDate,
 					location,
 					imagePath,
-					location_lat, 
+					location_lat,
 					location_lng
 				];
-	
+
 				await db.promise().query(incidentsInsert, values);
 
 				sendNotification({
@@ -263,15 +383,15 @@ app.post("/submit-incident", async (req, res) => {
 					date: incidentDate,
 					image_path: imagePath,
 				});
-	
+
 				// // Increment the notification count in session
 				req.session.notificationCount = (req.session.notificationCount || 0) + 1;
-	
+
 				res.redirect("/incident-success");
 			}
+		}
 
-
-		} catch (error) {
+		catch (error) {
 			console.error("Error reporting incident:", error);
 			res.status(500).json({ message: "Error reporting incident" });
 		}
@@ -307,16 +427,12 @@ app.post("/send-message", (req, res) => {
 			console.error("Error sending email:", error);
 			return res
 				.status(500)
-				.redirect(
-					"http://localhost:5000/error?msg=Error occurred while sending email."
-				);
+				.redirect("/error?msg=Error occurred while sending email.");
 		}
 		console.log("Email sent:", info.response);
 		res.redirect(
-			"http://localhost:5000/success?msg=Your message has been sent! We'll get back to you shortly.",
-			{
-				user,
-			}
+			"/success?msg=Your message has been sent! We'll get back to you shortly.",
+			{ user }
 		);
 	});
 });
@@ -325,7 +441,8 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 app.get("/login", (req, res) => {
-	res.render("login");
+	const user = req.session.user || null;
+	res.render("login", { user });
 });
 
 // Register Route
@@ -424,6 +541,7 @@ app.post("/login", async (req, res) => {
 					address: user.address,
 					room_id: user.room_id,
 					profilePic: user.profilePic,
+					role: user.role, // Add the role field here
 				};
 
 				res.redirect("http://localhost:5000/");
@@ -452,18 +570,15 @@ app.get("/chat", (req, res) => {
 	const userID = req.session.user.id;
 	const userName = req.session.user.name;
 
-
 	const user = req.session.user || null;
 	res.render("chat", { user, isRegistered: !!req.session.user });
 });
 
 // Handle socket connection inside the chat route
 io.on("connection", (socket) => {
-
 	// Join the group by the group ID
 	socket.on("join-room", roomID => {
 		socket.join(roomID);
-
 
 		// fetching existing messages from the mrssage table
 		const query = `
@@ -502,10 +617,6 @@ io.on("connection", (socket) => {
 		});
 	});
 
-
-
-
-
 	// Sending messages to all members
 	socket.on("send-message", (data) => {
 
@@ -525,7 +636,7 @@ io.on("connection", (socket) => {
 					roomId: data.roomID,
 					newMessage: data.message,
 					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
-					userName: userProfile[0].full_name
+					userName: userProfile[0].full_name,
 				});
 
 
@@ -536,9 +647,8 @@ io.on("connection", (socket) => {
 					roomId: data.roomID,
 					newMessage: data.message,
 					userProfile: userProfile[0].profilePic, // Optional chaining to avoid errors
-					userName: userProfile[0].full_name
+					userName: userProfile[0].full_name,
 				});
-
 			});
 		});
 

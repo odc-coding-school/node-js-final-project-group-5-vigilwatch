@@ -1,25 +1,28 @@
 <link rel="stylesheet" href="/css/extra-style.css">
 
 
-
-
-
-<header class="bg-red-700 py-6 shadow-md fixed right-0 left-0 top-0 z-10">
+<header class="bg-red-700 py-6 shadow-md fixed right-0 left-0 top-0">
     <div class="container mx-auto px-4 flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-white">HubWatch</h1>
+        <h1 class="text-3xl font-bold text-white hover:cursor-pointer"><a href="/">HubWatch</a></h1>
 
 
         <nav class="flex items-center justify-between">
             <ul class="space-x-6 text-white items-center hidden md:flex">
+
                 <li><a href="/" class="hover:underline">Home</a></li>
                 <li><a href="/report" class="hover:underline">Report Incident</a></li>
                 <li><a href="/analytics" class="hover:underline">Analytics</a></li>
                 <li><a href="/news" class="hover:underline">News</a></li>
                 <%if(isRegistered) { %>
-                    <li><a href="/logout" class="hover:underline">Logout</a></li>
+                    <!-- <li><a href="/logout" class="hover:underline">Logout</a></li> -->
                 <% } else {%>
                     <li><a href="/login" class="hover:underline">Login</a></li>
-               <% }%>
+                <% }%>
+
+                <% if (isRegistered && user.role === 1) { %>
+
+                    <li><a href="/admin/news/import" >Import News</a></li>
+                <% } %>
             </ul>
 
 
@@ -28,7 +31,7 @@
                     <li class="relative list-none">
 
                         <button id="profile-menu-btn" class="flex items-center focus:outline-none">
-                            <img src="<%= user.profilePic ? user.profilePic : '/uploads/user-solid.svg' %>"
+                            <img src="<%= user.profilePic ? user.profilePic : '/user-solid.svg' %>"
                                 alt="Profile" class="w-10 h-10 rounded-full border-4 border-gray-500">
                         </button>
 
@@ -46,6 +49,15 @@
                                             class="block w-full text-cente text-white bg-red-700 hover:bg-red-800">Upload
                                             Profile</button>
                                     </form>
+
+                                    <% if (user && user.role === 1) { %>
+                                    <li class="w-full"><button class="block w-full text-center text-white bg-red-700 hover:bg-red-800"><a href="/admin">Admin Panel</a></button></li>
+                                    <% } %>
+                                    <br>
+
+                                    <% if (user && user.role === 1 || user && user.role === 0) { %>
+                                    <li class="w-full"><button class="block w-full text-center text-white bg-red-700 hover:bg-red-800"><a href="/user/profile">Profile</a></button></li>
+                                    <% } %>
                                 </li>
                                 <li class="w-full">
                                     <form action="/logout" method="POST" class="block w-full px-4 py-2">
@@ -57,7 +69,8 @@
                         </div>
                     </li>
                     <% }%>
-                        
+
+
 
                 <div class="menu md:hidden">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
