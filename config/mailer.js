@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+
 const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
@@ -24,20 +25,21 @@ const sendNotification = async ({
 			"princessangelvahn1@gmail.com",
 		],
 		subject: "New Incident Reported",
-		text:
-			`${reporterName} just reported an incident:\n\n` +
-			`Location: ${location}\n` +
-			`Description: ${description}\n` +
-			`Incident Type: ${incidentType}\n` +
-			`Date: ${date}\n` +
-			`image :${image_path}`,
+		text: `
+            ${reporterName} just reported an incident:\n
+            Location: ${location}\n
+            Description: ${description}\n
+            Incident Type: ${incidentType}\n
+            Date: ${date}\n
+            Image: ${image_path}
+        `,
 	};
 
 	try {
 		await transporter.sendMail(mailOptions);
 		console.log("Email sent successfully");
 	} catch (error) {
-		console.error("Error sending email:", error);
+		console.error("Error sending email:", error.message);
 	}
 };
 
