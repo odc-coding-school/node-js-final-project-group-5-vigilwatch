@@ -1,20 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database");
-const {formatDistanceToNow} = require("date-fns")
+const { formatDistanceToNow } = require("date-fns")
 const axios = require('axios');
 const cheerio = require("cheerio");
 
 
-const scrapeNew = async()=>{
+const scrapeNew = async () => {
 	const url = "https://www.frontpageafricaonline.com";
-	const {data} = await axios.get(url);
+	const { data } = await axios.get(url);
 	const cheerioInstance = cheerio.load(data);
-	const newItemGroup =[] ;
-	console.log(data)
+	const newItemGroup = [];
 }
-
-scrapeNew()
 
 
 
@@ -57,31 +54,31 @@ router.get("/", (req, res) => {
 
 
 
-		res.render("news", {modifiedNews, user, isRegistered: !!req.session.user });
+		res.render("news", { modifiedNews, user, isRegistered: !!req.session.user });
 	})
 
 
 });
 
 
-router.get("/:id", (req, res)=>{
+router.get("/:id", (req, res) => {
 	const user = req.session.user || null;
 
-	const  query = "SELECT * FROM incidents WHERE id = ?";
+	const query = "SELECT * FROM incidents WHERE id = ?";
 	const newsId = req.params.id;
 	const error = "News not found";
 
-	db.query(query, [newsId], (err, specificNews)=>{
-		if(err) return res.status(500).json(err.message);
+	db.query(query, [newsId], (err, specificNews) => {
+		if (err) return res.status(500).json(err.message);
 
 		// if(specificNews.length === 0) return res.status(409).render("singleNew", {error});
 
 		console.log(specificNews);
 
-		
-		
-	
-		res.render("singleNew", {url:`http://localhost:5000/news/${specificNews[0].id}`, specificNews, user, isRegistered: !!req.session.user });
+
+
+
+		res.render("singleNew", { url: `http://localhost:5000/news/${specificNews[0].id}`, specificNews, user, isRegistered: !!req.session.user });
 	})
 
 })

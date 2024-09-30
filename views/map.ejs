@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hubwatch Map Vies</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+   
+    <style>
+        #map {
+            width: 100%;
+            margin-inline: auto;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <div id="map"></div>
+
+        <!-- search bar -->
+         <section class="bg-white ">
+            <div class="menu md:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
+                    viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5">
+                    </path>
+                </svg>
+            </div>
+
+            <input type="text" placeholder="Search hubwatch Crime">
+
+            <div></div>
+         </section>
+    </main>
+
+   
+<script>
+    const map = L.map('map').setView([20, 0], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+}).addTo(map);
+
+
+const crimeReports = <%- JSON.stringify(crimes) %>
+
+crimeReports.forEach(crime => {
+    console.log(crime.location_lat);
+    
+    L.marker([crime.location_lat, crime.location_lng]).addTo(map)
+    .bindPopup(`<b>${crime.incident_type}</b> 
+    <br>${crime.description}`).openPopup()
+    
+});
+
+
+
+
+
+</script>
+
+    
+</body>
+</html>

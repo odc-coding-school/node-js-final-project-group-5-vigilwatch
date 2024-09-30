@@ -1,8 +1,12 @@
-GET http://localhost:5000/api/news
+GET http://localhost:5000/map
 
 
 ###
-GET http://localhost:5000/news/7
+POST http://localhost:5000/map
+
+{
+    "location":"CaldWell"
+} 
 
 
 ###
@@ -29,7 +33,7 @@ Content-Type: application/json
 
 {
     "email": "hawakromah@gmail.com",
-    "password": "hawa"
+    "password": "hawaq"
 }
 
 ###

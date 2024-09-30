@@ -12,7 +12,7 @@
 		<!-- header end -->
 		<!-- Header -->
 		<main
-			class="login-container flex justify-between mt-4 mx-auto ml-8 mr-8 bg-white rounded-lg flex-grow"
+			class="login-container flex justify-between mt-24 mb-10  mx-auto ml-8 mr-8 bg-white rounded-lg flex-grow"
 		>
 			<section
 				class="left-login-container w-1/2 hidden md:flex flex-col justify-end items-cente"
@@ -46,7 +46,7 @@
 					<hr class="border-customgray border-1 md:w-0 lg:w-20" />
 				</div>
 
-				<form action="/register" method="POST" id="login-form">
+				<form action="/register" method="POST" id="login-form" class="px-20">
 					<div class="flex flex-col">
 						<div
 							class="relative flex items-center justify-center"
@@ -58,6 +58,7 @@
 								name="full_name"
 								placeholder="Enter full name"
 							/>
+
 							<div class="absolute top-9 left-4">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -82,6 +83,7 @@
 								name="email"
 								placeholder="email@gmail.com"
 							/>
+
 							<div class="absolute top-9 left-4">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -163,6 +165,12 @@
 								</button>
 							</div>
 						</div>
+
+						<% if(typeof errorMessage !== 'undefined') {%>
+							<p class="email-error text-left text-[red] font-bold">
+								<%= errorMessage %>
+							</p>
+						<%}%>
 					</div>
 
 					<div class="btns flex flex-col justify-center items-center mt-5">
@@ -180,6 +188,7 @@
 							<a href="./login" class="text-blue-600 underline">Login</a>
 						</div>
 					</div>
+
 				</form>
 			</section>
 		</main>

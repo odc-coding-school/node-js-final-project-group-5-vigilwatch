@@ -10,6 +10,8 @@ const session = require("express-session");
 const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
+const axios = require("axios");
+
 
 const cors = require("cors");
 
@@ -18,15 +20,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
 
-app.use(
-	cors({
-		origin: "https://localhost:5000",
-	})
-);
+app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("views", path.join(__dirname, "views"));
@@ -34,7 +32,7 @@ app.set("view engine", "ejs");
 
 app.use(
 	session({
-		secret: "Y6%#UBGHgfxf)88976CGFDR#4$RTYU",
+		secret: process.env.secret,
 		resave: false,
 		saveUninitialized: false,
 		cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
@@ -72,6 +70,7 @@ const policyRoutes = require("./routes/policyRoutes");
 const termsOfServiceRoutes = require("./routes/termsOfServiceRoutes");
 const loginUserRoute = require("./routes/api.js");
 const incidentSuccessRoutes = require("./routes/incidentSuccessRoutes");
+const mapRoute = require("./routes/map-route.js");
 
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
@@ -85,6 +84,7 @@ app.use("/news", newsRoutes);
 app.use("/policy", policyRoutes);
 app.use("/termsOfService", termsOfServiceRoutes);
 app.use("/incident-success", incidentSuccessRoutes);
+app.use("/map", mapRoute)
 
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
@@ -196,7 +196,9 @@ app.get("/get-user-location", async (req, res) => {
 	}
 });
 
-app.post("/submit-incident", (req, res) => {
+
+
+app.post("/submit-incident", async (req, res) => {
 	upload(req, res, async (err) => {
 		try {
 			if (err) {
@@ -204,7 +206,8 @@ app.post("/submit-incident", (req, res) => {
 			}
 
 			const { userId, incidentType, description, incidentDate, location } =
-				req.body;
+				req.body
+
 
 			// Fetch user's registered location
 			const userQuery = "SELECT user_address FROM users WHERE id = ?";
@@ -214,6 +217,7 @@ app.post("/submit-incident", (req, res) => {
 			const [reporter] = await db.promise().query(nameQuery, [userId]);
 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
+
 			if (userLocation && location !== userLocation) {
 				return res
 					.status(400)
@@ -222,33 +226,51 @@ app.post("/submit-incident", (req, res) => {
 					);
 			}
 
-			// Proceed with inserting the incident
-			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-			const incidentsInsert =
-				"INSERT INTO incidents (incident_type, description, incident_date, location, image_path) VALUES (?, ?, ?, ?, ?)";
-			const values = [
-				incidentType,
-				description,
-				incidentDate,
-				location,
-				imagePath,
-			];
+			// geting the user geolocation from open cage
+			// // // opencage Geo API URL
+			const openCageURL = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${process.env.HUBWATCH_OPEN_CAGE_APIKEY}&language=en&pretty=1`;
+			const response = await axios.get(openCageURL);
+			const result = response.data;
 
-			await db.promise().query(incidentsInsert, values);
+			if (result.length !== 0) {
+				const location_lat = result.results[0].geometry.lat;
+				const location_lng = result.results[0].geometry.lng;
+				
+				// // Proceed with inserting the incident
+				const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+	
+	
+	
+				const incidentsInsert =
+					"INSERT INTO incidents (incident_type, description, incident_date, location, image_path, location_lat, location_lng) VALUES (?, ?, ?, ?, ?, ?, ?)";
+				const values = [
+					incidentType,
+					description,
+					incidentDate,
+					location,
+					imagePath,
+					location_lat, 
+					location_lng
+				];
+	
+				await db.promise().query(incidentsInsert, values);
 
-			sendNotification({
-				reporterName,
-				location,
-				description,
-				incidentType,
-				date: incidentDate,
-				image_path: imagePath,
-			});
+				sendNotification({
+					reporterName,
+					location,
+					description,
+					incidentType,
+					date: incidentDate,
+					image_path: imagePath,
+				});
+	
+				// // Increment the notification count in session
+				req.session.notificationCount = (req.session.notificationCount || 0) + 1;
+	
+				res.redirect("/incident-success");
+			}
 
-			// Increment the notification count in session
-			req.session.notificationCount = (req.session.notificationCount || 0) + 1;
 
-			res.redirect("/incident-success");
 		} catch (error) {
 			console.error("Error reporting incident:", error);
 			res.status(500).json({ message: "Error reporting incident" });
@@ -318,7 +340,8 @@ app.post("/register", async (req, res) => {
 			[email],
 			async (err, results) => {
 				if (results.length > 0) {
-					return res.status(400).json({ message: "User already exists" });
+					return res.status(409).render("register", { errorMessage: "User already exists" });
+
 				}
 
 				//check if location exist in room table
@@ -387,7 +410,7 @@ app.post("/login", async (req, res) => {
 				const isMatch = await bcrypt.compare(password, user.password);
 
 				if (!isMatch) {
-					return res.render("login", { error: "Invalid email or password" });
+					return res.status(401).render("login", { error: "Invalid email or password" });
 				}
 
 				// Checking if user is registered
@@ -438,7 +461,7 @@ app.get("/chat", (req, res) => {
 io.on("connection", (socket) => {
 
 	// Join the group by the group ID
-	socket.on("join-room", roomID =>{
+	socket.on("join-room", roomID => {
 		socket.join(roomID);
 
 
@@ -453,7 +476,7 @@ io.on("connection", (socket) => {
 		`;
 		db.query(query, [roomID], (err, previousMessages) => {
 			if (err) throw err;
-			
+
 			let existingMessages = { message: [] };
 			previousMessages.forEach((prevMessage) => {
 				const messagedTime = new Date(prevMessage.messaged_time);
@@ -471,7 +494,7 @@ io.on("connection", (socket) => {
 					userId: prevMessage.user_id,
 					profile: prevMessage.user_profile,
 				});
-			
+
 			});
 
 			// Emit previous messages to the user
@@ -485,7 +508,7 @@ io.on("connection", (socket) => {
 
 	// Sending messages to all members
 	socket.on("send-message", (data) => {
-		
+
 		const query =
 			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
 		db.query(query, [data.userID, data.roomID, data.message], (err) => {
@@ -505,7 +528,7 @@ io.on("connection", (socket) => {
 					userName: userProfile[0].full_name
 				});
 
-				
+
 
 				//Emit new message to the senders
 				socket.emit("new-message", {
@@ -519,7 +542,7 @@ io.on("connection", (socket) => {
 			});
 		});
 
-		
+
 	});
 
 	// Handle user disconnection
