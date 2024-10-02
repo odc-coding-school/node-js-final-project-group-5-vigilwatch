@@ -2,6 +2,10 @@ GET http://localhost:5000/map
 
 
 ###
+GET  http://localhost:5000/map/filter-location?locationFilter=Jamica
+
+
+###
 POST http://localhost:5000/map
 
 {

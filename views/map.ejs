@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hubwatch Map Vies</title>
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="/css/map.css">
+    <script src=""></script>
 
-   
+
+
     <style>
-        #map {
-            width: 100%;
-            margin-inline: auto;
-            height: 600px;
+        .suggested-area {
+            background-color: #fff;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+            max-height: calc(100vh - 200px);
         }
     </style>
 </head>
+
 <body>
 
     <main>
-        <div id="map"></div>
-
         <!-- search bar -->
-         <section class="bg-white ">
-            <div class="menu md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
+        <section class="border w-full rounded-full flex items-center relative top-11 sm:w-3/4 sm:left-[20%] md:w-1/2 md:left-[20%] 
+            lg:w-[40%] lg:left-[30%] bg-white z-50">
+            <div class="menu p-4 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="menu-icon"
                     viewBox="0 0 16 16">
                     <path fill-rule="evenodd"
                         d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5">
@@ -32,37 +38,97 @@
                 </svg>
             </div>
 
-            <input type="text" placeholder="Search hubwatch Crime">
+            <form action="/map/filter-location" class="flex-1 flex h-full w-full items-center">
+                <input type="text" placeholder="Search Hubwatch Crime Area" class="w-full h-full p-2 outline-none"
+                    name="locationFilter">
+                <button type="submit" class="mr-7 ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                      </svg>
+                </button>
+            </form>
+            <span class="cancel-btn font-semibold text-[#aaa] text-xl mr-5 cursor-pointer">X</span>
 
-            <div></div>
-         </section>
+        </section>
+        <div class="suggested-area border w-full flex items-center relative top-12 sm:w-3/4 sm:left-[20%] md:w-1/2 md:left-[20%] 
+        lg:w-[40%] lg:left-[30%] bg-white z-50"></div>
+
+        <div id="map" class="flex flex-1"></div>
+
     </main>
 
-   
-<script>
-    const map = L.map('map').setView([6.4281, 9.4295], 13);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-}).addTo(map);
+    <script>
 
+        const cancelBtn = document.querySelector(".cancel-btn")
+        const input = document.querySelector('input')
+        const suggestedAreaWrapper = document.querySelector('.suggested-area')
 
-const crimeReports = <%- JSON.stringify(crimes) %>
-
-crimeReports.forEach(crime => {
-    console.log(crime.location_lat);
-    
-    L.marker([crime.location_lat, crime.location_lng]).addTo(map)
-    .bindPopup(`<b>${crime.incident_type}</b> 
-    <br>${crime.description}`).openPopup()
-    
-});
+        cancelBtn.addEventListener("click", function () {
+            input.value = "";
+        })
 
 
+        //     const map = L.map('map').setView([6.4281, 9.4295], 13);
+
+        //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     }).addTo(map);
+
+
+        //     const crimeReports = <% - JSON.stringify(crimes) %>
+
+        //         crimeReports.forEach(crime => {
+        //             console.log(crime.location_lat);
+
+        //             L.marker([crime.location_lat, crime.location_lng]).addTo(map)
+        //                 .bindPopup(`<b>${crime.incident_type}
+        // <br>${crime.description}`).openPopup()
+
+        //         });
+
+        document.querySelector("form").addEventListener("click", (e) => {
+            e.preventDefault()
+
+        })
 
 
 
-</script>
+        //function to fetch location on key down
+        const searchData = async (inputValue) => {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${inputValue},+Montserrado,+Liberia`;
+            const response = await fetch(url)
+            if (response.ok) {
+                const data = response.json();
+                return data;
+            }
 
-    
+        }
+
+
+        input.addEventListener("input", async (e) => {
+            const inputValue = input.value
+            //checking if the input value is less then three
+            if (inputValue < 3) return [];
+            //returning the fetching data
+            const suggestedLocation = await searchData(inputValue);
+
+
+            suggestedLocation.forEach(location => {
+                const locationDiv = document.createElement('div');
+                locationDiv.innerText = location.display_name;
+                locationDiv.className = "suggestion"
+                suggestedAreaWrapper.appendChild(locationDiv)
+
+            })
+
+
+
+
+        })
+
+    </script>
+
+
 </body>
+
 </html>

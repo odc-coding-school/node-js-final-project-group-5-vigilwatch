@@ -348,7 +348,7 @@ app.post("/submit-incident", async (req, res) => {
 
 			// geting the user geolocation from open cage
 			// // // opencage Geo API URL
-			const openCageURL = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${process.env.HUBWATCH_OPEN_CAGE_APIKEY}&language=en&pretty=1`;
+			const openCageURL = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)},+Liberia&key=${process.env.HUBWATCH_OPEN_CAGE_APIKEY}&language=en&pretty=1`;
 			const response = await axios.get(openCageURL);
 			const result = response.data;
 
