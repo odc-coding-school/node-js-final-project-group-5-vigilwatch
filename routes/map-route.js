@@ -4,12 +4,13 @@ const db = require("../database.js");
 
 
 router.get('/', async (req, res) => {
-    let query = `SELECT * FROM incidents`;
+    const user = req.session.user || null;
+    let query = `SELECT * FROM incidents WHERE status = "confirmed"`;
     
     db.query(query, (err, result) => {
         if (err) return res.status(500).json(err.message);
          
-        return res.render("map", {crimes: result});
+        return res.render("map", {crimes: result, isRegistered: !!req.session.user, user});
     })
 
 })

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/extra-style.css">
+
+    <style>
+        .active-link {
+            text-decoration: underline;
+            color: red;
+        }
+
+        .link,
+        .active {
+            transition: .5s ease-in-out;
+        }
+
+        .link:hover .active {
+            opacity: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <%- include('includes/header') %>
+        <!-- header end -->
+
+        <div class="flex min-h-screen mt-14 pt-7">
+            <!-- admin sidebar -->
+            <%- include('admin-utils/sidebar')%>
+                <main class="flex-1 p-6 ml-64">
+                    <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+
+                    <!-- Incident Stats -->
+                    <div class="mt-4">
+                        <h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Welcome to VigilWatch</h1>
+                        <section class="flex flex-col md:flex-row">
+
+                            <div class="report-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl mb-2 shadow-lg 
+                            border border-[#fcfcfc] p-5">
+                                <div class="reported-crime-count">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
+                                        class="bi bi-people-fill text-red-700" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                                    </svg>
+                                </div>
+
+                                <div class="text-sm text-gray-600 mt-4">Reported Incidents:</div>
+                                <div class="text-2xl font-semibold text-gray-800">
+                                    <%=reportedReported%>
+                                </div>
+
+                            </div>
+
+                            <!-- Pending crimes Count -->
+                            <div class="pending-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl 
+                            border border-[#fcfcfc] p-5 shadow-md">
+                                <div class="pending-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
+                                        class="bi bi-hourglass-bottom  text-red-700" viewBox="0 0 16 16">
+                                        <path
+                                            d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5m2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2z" />
+                                    </svg>
+                                </div>
+
+                                <div class="text-sm text-gray-600">Pending Incidents:</div>
+                                <div class="text-2xl font-semibold text-gray-800">
+                                    <%=pendingIncidents %>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </main>
+        </div>
+
+
+
+        <script>
+
+        </script>
+</body>
+
+</html>

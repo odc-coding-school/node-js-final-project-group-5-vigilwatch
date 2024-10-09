@@ -10,22 +10,24 @@ const db = mysql2.createConnection({
 
 db.connect(function (err) {
 	if (err) return console.log(err.message);
-	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database`, function (err) {
+	db.query(`CREATE DATABASE IF NOT EXISTS vigilwatch_database`, function (err) {
 		if (err) return console.log(err.message);
 		return console.log("database is created successfully");
 	});
 	console.log("database connected");
 });
 
+
 const createTables = () => {
 	const createUsersTable = `
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             full_name VARCHAR(100),
-            email VARCHAR(100) UNIQUE,
-            password VARCHAR(255),
+            email VARCHAR(100),
             user_address VARCHAR(255),
-            room_id INT, 
+			phone_number VARCHAR(13) NOT NULL UNIQUE,
+			otp_number VARCHAR(6),
+            room_id INT,
             profilePic VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -51,16 +53,16 @@ const createTables = () => {
             location VARCHAR(255) NOT NULL,
             image_path VARCHAR(255),
 			userId INT,
-            FOREIGN KEY (userId) REFERENCES users(id)
+            FOREIGN KEY (userId) REFERENCES users(id),
             location_lat DECIMAL(10, 8),
-            location_lng DECIMAL(11, 8),
+            location_lng DECIMAL(10, 8),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `;
 
 	db.query(createIncidentsTable, (error, result) => {
 		if (error) {
-			console.log("error creating incidents table");
+			console.log(error.message);
 		} else {
 			console.log("Incidents table created or already exists");
 		}

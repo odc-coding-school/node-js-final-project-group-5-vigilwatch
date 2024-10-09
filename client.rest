@@ -2,7 +2,7 @@ GET http://localhost:5000/map
 
 
 ###
-GET  http://localhost:5000/map/filter-location?locationFilter=Jamica
+GET http://localhost:5000/user-report-crime/10
 
 
 ###
@@ -36,10 +36,23 @@ Content-Type: application/json
 
 
 {
-    "email": "hawakromah@gmail.com",
-    "password": "hawaq"
+    "phoneNumber": "0886828747"
 }
 
+###
+POST http://localhost:5000/verify-number
+Content-Type: application/json
+
+{
+    "otpNumber": "462218"
+}
+###
+POST http://localhost:5000/fetch-location
+Content-Type: application/json
+
+{
+    "locationFilter": "Bassa"
+}
 ###
 POST http://localhost:5000/register
 Content-Type: application/json

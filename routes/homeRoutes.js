@@ -2,10 +2,15 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 
-router.get("/", (req, res) => {
+router.get("/", async(req, res) => {
 	const notificationCount = req.session.notificationCount || 0; // Get notification count from session
 	req.session.notificationCount = 0; // Reset notification count
 	const hasAlerted = req.session.hasAlerted || false;
+
+	// Latest news
+	const latestNews = await db.promise().query(
+		`SELECT * FROM incidents WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
+	`);
 
 	const user = req.session.user || null;
 	res.render("home", {
@@ -13,6 +18,8 @@ router.get("/", (req, res) => {
 		isRegistered: !!req.session.user,
 		notificationCount,
 		hasAlerted,
+		latestNewsFetched: latestNews[0],
+
 	});
 });
 

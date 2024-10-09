@@ -34,15 +34,14 @@
 
         <div class="flex min-h-screen mt-14 pt-7">
 
-            <!-- admin header -->
+            <!-- hea -->
            <%- include('admin-utils/sidebar')%>
 
 
             <main class="flex-1 p-6 ml-64">
-                <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+                <h1 class="text-2xl font-bold mb-6">User Management</h1>
 
-
-                <!-- <section id="manage-users" class="hidden">
+                <section id="manage-users" class="">
                     <h2 class="text-xl font-semibold mb-4">Users</h2>
                     <table class="w-full bg-white border border-gray-300 table-auto">
                         <thead>
@@ -75,51 +74,6 @@
                     </table>
                 </section>
 
-
-                <section id="unconfirmed-incidents" class="hidden">
-                    <h2 class="text-xl font-semibold mb-4">Unconfirmed Incidents</h2>
-                    <table class="w-full bg-white border border-gray-300 table-auto">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-4 text-left">Type</th>
-                                <th class="border p-4 text-left">Description</th>
-                                <th class="border p-4 text-left">Location</th>
-                                <th class="border p-4 text-left">Date</th>
-                                <th class="border p-4 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% incidents.forEach(incident=> { %>
-                                <tr class="border">
-                                    <td class="border p-4">
-                                        <%= incident.incident_type %>
-                                    </td>
-                                    <td class="border p-4">
-                                        <%= incident.description %>
-                                    </td>
-                                    <td class="border p-4">
-                                        <%= incident.location %>
-                                    </td>
-                                    <td class="border p-4">
-                                        <%= incident.incident_date %>
-                                    </td>
-                                    <td class="border p-4 flex space-x-2">
-                                        <form action="/admin/confirm-incident" method="POST">
-                                            <input type="hidden" name="incidentId" value="<%= incident.id %>">
-                                            <button type="submit"
-                                                class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Confirm</button>
-                                        </form>
-                                        <form action="/admin/delete-incident" method="POST">
-                                            <input type="hidden" name="incidentId" value="<%= incident.id %>">
-                                            <button type="submit"
-                                                class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                </section> -->
             </main>
         </div>
 

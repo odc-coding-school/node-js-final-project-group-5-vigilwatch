@@ -5,20 +5,23 @@ const path = require("path");
 const db = require("./database.js");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const flash = require("connect-flash")
 const session = require("express-session");
+const rateLimit = require('express-rate-limit');
 const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
 const axios = require("axios");
-
-
 const cors = require("cors");
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
+
+
+//middlewire to delay the limit
+// const limiter = 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -38,7 +41,13 @@ app.use(
 		cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 	})
 );
+app.use(flash())
 
+app.use((req, res, next)=> {
+	res.locals.success_msg = req.flash("success")
+	res.locals.error_msg = req.flash("error")
+	next()
+})
 // Multer for handling image uploads
 const storage = multer.diskStorage({
 	destination: "./public/uploads/",
@@ -74,6 +83,11 @@ const registeredUsers = require("./middleware/auth");
 const isAdmin = require("./middleware/isAdmin");
 const mapRoute = require("./routes/map-route.js");
 
+// Import twilio library
+const twilio = require('twilio');
+const AccountSID = process.env.ACCOUNT_SID;
+const AuthTOKEN = process.env.AUTH_TOKEN;
+
 app.use("/", homeRoutes);
 app.use("/contact", contactRoutes);
 app.use("/user", userRoutes);
@@ -88,7 +102,27 @@ app.use("/termsOfService", termsOfServiceRoutes);
 app.use("/incident-success", incidentSuccessRoutes);
 app.use('/map', mapRoute);
 
-// news route
+
+
+//setting up the otp
+
+// create Client for Twilio;
+const client = twilio(AccountSID, AuthTOKEN);
+
+//Send SMS function
+const sendSMS = (receipient, sender, body) => {
+	client.messages.create({
+		to: receipient,
+		from: sender,
+		body: body,
+	})
+		.then(message => {
+			console.log("message sent successfully", message.sid);
+		})
+		.catch(error => {
+			console.log("Error sending message", error);
+		})
+}
 
 // Route to get specific news item by id
 app.get("/news/:id", async (req, res) => {
@@ -122,7 +156,7 @@ app.get("/news", async (req, res) => {
 			.query("SELECT * FROM news ORDER BY created_at DESC");
 
 		// Rendering the news view and pass the news data to the template file
-		res.render("news", { modifiedNews: news, user });
+		res.render("news", { modifiedNews: news, user, isRegistered: !!req.session.user });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Server Error");
@@ -132,8 +166,9 @@ app.get("/news", async (req, res) => {
 // Route to fetch and display the news
 app.get("/admin/news/import", isAdmin, (req, res) => {
 	const user = req.session.user || null;
-	res.render("importNews", { user }); // Render the news page
+	res.render("importNews", { user, isRegistered: !!req.session.user }); // Render the news page
 });
+
 // news end
 // app.get("/user/profile", registeredUsers, async (req, res) => {
 // 	const userId = req.session.user.id;
@@ -185,6 +220,9 @@ app.get("/admin/news/import", isAdmin, (req, res) => {
 
 app.get("/user/profile", registeredUsers, async (req, res) => {
 	const userId = req.session.user.id;
+	const userRole = req.session.user.role;
+	
+
 
 	try {
 		// Fetch user data
@@ -194,6 +232,9 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 				"SELECT full_name, profilePic, user_address FROM users WHERE id = ?",
 				[userId]
 			);
+
+			console.log(user);
+			
 
 		// Count reported incidents
 		const [reportedIncidents] = await db
@@ -211,12 +252,36 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 				[userId]
 			);
 
-		// Render the user profile using EJS
-		res.render("profile", {
-			user: user[0],
-			reportedCount: reportedIncidents[0].count,
-			pendingCount: pendingIncidents[0].count,
-		});
+
+		const latestNews = await db.promise().query(
+			`SELECT * FROM incidents join users on(users.id=incidents.userId) WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
+		`, [userId]);
+
+
+		
+
+		db.query(
+			`SELECT * FROM incidents WHERE userId =?`,
+			[userId],
+			(err, userReportedCrime) => {
+				if (err) throw err;
+
+
+				// Render the user profile using EJS
+				res.render("profile", {
+					user: user[0],
+					reportedCount: reportedIncidents[0].count,
+					pendingCount: pendingIncidents[0].count,
+					userReportedCrime: userReportedCrime,
+					latestNewsFetched: latestNews[0],
+					userRole,
+					isRegistered: !!req.session.user
+				});
+			}
+		);
+
+
+
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Server Error");
@@ -224,7 +289,81 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 });
 
 //admin route
-app.get("/admin", isAdmin, (req, res) => {
+// app.get("/admin", isAdmin, (req, res) => {
+// 	const user = req.session.user || null;
+// 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
+// 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
+
+// 	db.query(userQuery, (err, users) => {
+// 		if (err) return res.status(500).send("Error retrieving users.");
+
+// 		db.query(incidentQuery, (err, incidents) => {
+// 			if (err) return res.status(500).send("Error retrieving incidents.");
+
+// 			res.render("admin-dashboard", { users, incidents, user });
+// 		});
+// 	});
+// });
+
+app.post("/admin/promote", isAdmin, (req, res) => {
+	const userId = req.body.userId;
+	const query = "UPDATE users SET role = 1 WHERE id = ?";
+
+	db.query(query, [userId], (err, result) => {
+		if (err) return res.status(500).send("Error promoting user to admin.");
+		res.redirect("/user-management");
+	});
+});
+
+// ================Dashboard Render=============// 
+app.get("/admin-dashboard", isAdmin, async(req, res) => {
+	const user = req.session.user || null;
+	const userId = req.session.user.id;
+
+
+	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
+	const incidentQuery = "SELECT * FROM incidents"; // All incidents
+	const countQuery = "SELECT COUNT(*) AS userCounts FROM users "; //number of the registered users
+	// Count reported incidents
+	const [reportedIncidents] = await db
+	.promise()
+	.query(
+		"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
+	);
+
+// Count pending incidents
+const [pendingIncidents] = await db
+	.promise()
+	.query(
+		"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
+	);
+
+	const [userCount] = await db.promise().query(countQuery);
+	console.log(reportedIncidents[0].count);
+	console.log(pendingIncidents[0].count);
+	
+
+	db.query(userQuery, (err, users) => {
+		if (err) return res.status(500).send("Error retrieving users.");
+
+		db.query(incidentQuery, (err, incidents) => {
+			if (err) return res.status(500).send("Error retrieving incidents.");
+
+			res.render("admin-dashboard", { users, incidents, user, 
+				userCount:userCount[0].userCounts,
+				reportedReported:reportedIncidents[0].count,
+				pendingIncidents:pendingIncidents[0].count,
+				isRegistered: !!req.session.user
+			});
+		});
+	});
+	
+	
+	
+});
+
+// ================User management Render=============// 
+app.get("/user-management", isAdmin, (req, res) => {
 	const user = req.session.user || null;
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
@@ -235,19 +374,35 @@ app.get("/admin", isAdmin, (req, res) => {
 		db.query(incidentQuery, (err, incidents) => {
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
-			res.render("admin", { users, incidents, user });
+			res.render("user-management", { users, incidents, user, isRegistered: !!req.session.user });
 		});
 	});
+	
 });
 
-app.post("/admin/promote", isAdmin, (req, res) => {
-	const userId = req.body.userId;
-	const query = "UPDATE users SET role = 1 WHERE id = ?";
+// ================Incidents management Render=============// 
+app.get("/incidents", isAdmin, async(req, res) => {
+	const user = req.session.user || null;
+	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
+	const incidentQuery = "SELECT * FROM incidents"; // All incidents
+	const countQuery = "SELECT COUNT(*) AS incidentCount FROM incidents ";
 
-	db.query(query, [userId], (err, result) => {
-		if (err) return res.status(500).send("Error promoting user to admin.");
-		res.redirect("/admin");
+	const [userCount] = await db.promise().query(countQuery);
+
+	
+	console.log(userCount[0].incidentCount);
+	
+
+	db.query(userQuery, (err, users) => {
+		if (err) return res.status(500).send("Error retrieving users.");
+
+		db.query(incidentQuery, (err, incidents) => {
+			if (err) return res.status(500).send("Error retrieving incidents.");
+
+			res.render("incidents", { users, incidents, user, count:userCount[0].incidentCount, isRegistered: !!req.session.user });
+		});
 	});
+	
 });
 
 app.post("/admin/confirm-incident", isAdmin, (req, res) => {
@@ -256,7 +411,7 @@ app.post("/admin/confirm-incident", isAdmin, (req, res) => {
 
 	db.query(query, [incidentId], (err, result) => {
 		if (err) return res.status(500).send("Error confirming incident.");
-		res.redirect("/admin");
+		res.redirect("/admin-dashboard");
 	});
 });
 
@@ -266,9 +421,10 @@ app.post("/admin/delete-incident", isAdmin, (req, res) => {
 
 	db.query(query, [incidentId], (err, result) => {
 		if (err) return res.status(500).send("Error deleting incident.");
-		res.redirect("/admin");
+		res.redirect("/admin-dashboard");
 	});
 });
+
 app.get("/error", (req, res) => {
 	const msg = req.query.msg || "There was an error sending your message.";
 	res.render("errorEmail", { msg });
@@ -316,6 +472,26 @@ app.get("/get-user-location", async (req, res) => {
 	}
 });
 
+app.post("/update-location", (req, res) => {
+	const user = req.session.user || null;
+	const {address} = req.body;
+
+	const userQuery = `UPDATE users SET user_address =?  WHERE id = ?`;
+	db.query(userQuery, [address, user.id], (err, result)=>{
+
+	
+		console.log(result);
+
+		req.session.user.user_address = address;
+		req.flash('success', "location change sucessfully!")
+		res.redirect('/user/profile') 
+		
+	});
+
+	
+
+	
+})
 
 
 app.post("/submit-incident", async (req, res) => {
@@ -338,13 +514,13 @@ app.post("/submit-incident", async (req, res) => {
 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
 
-			if (userLocation && location !== userLocation) {
-				return res
-					.status(400)
-					.send(
-						"Error: The location entered doesn't match your registered location."
-					);
-			}
+			// if (userLocation && location !== userLocation) {
+			// 	return res
+			// 		.status(400)
+			// 		.send(
+			// 			"Error: The location entered doesn't match your registered location."
+			// 		);
+			// }
 
 			// geting the user geolocation from open cage
 			// // // opencage Geo API URL
@@ -353,25 +529,31 @@ app.post("/submit-incident", async (req, res) => {
 			const result = response.data;
 
 			if (result.length !== 0) {
+				console.log(result);
+
 				const location_lat = result.results[0].geometry.lat;
 				const location_lng = result.results[0].geometry.lng;
 
 				// // Proceed with inserting the incident
 				const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
-
-
+				const user = req.session.user;
 				const incidentsInsert =
-					"INSERT INTO incidents (incident_type, description, incident_date, location, image_path, location_lat, location_lng) VALUES (?, ?, ?, ?, ?, ?, ?)";
+					"INSERT INTO incidents (incident_type, description, incident_date, location, image_path, userId, location_lat, location_lng) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
 				const values = [
 					incidentType,
 					description,
 					incidentDate,
 					location,
 					imagePath,
+					user.id,
 					location_lat,
 					location_lng
 				];
+
+				// Sending the sms to the Admin that a user just reported a crime
+				// sendSMS(user.phone_number, process.env.VERIFIED_PHONE, `${user.full_name} just reported a crime from ${location}`);
+
 
 				await db.promise().query(incidentsInsert, values);
 
@@ -440,15 +622,32 @@ app.post("/send-message", (req, res) => {
 app.get("/register", (req, res) => {
 	res.render("register");
 });
+
 app.get("/login", (req, res) => {
 	const user = req.session.user || null;
 	res.render("login", { user });
 });
 
+app.get("/verify-number", (req, res) => {
+	res.render('verify-number')
+})
+
+
+const regex = /^[\d+]+$/;
+const countryCode = "+231";
+
 // Register Route
 app.post("/register", async (req, res) => {
-	const { full_name, email, address, password } = req.body;
-	const hashedPassword = await bcrypt.hash(password, 10);
+	const { full_name, email, address } = req.body;
+	let phoneNumber = req.body.number;
+
+	//removing the zero from the phone number
+	const splicePhoneNumber = phoneNumber.slice(1);
+
+	//formating the number to have country code
+	const formatedPhoneNumber = `${countryCode}${splicePhoneNumber}`;
+
+	console.log(formatedPhoneNumber);
 
 	try {
 		//checke if email exist in the user table
@@ -456,101 +655,252 @@ app.post("/register", async (req, res) => {
 			"SELECT * FROM users WHERE email = ?",
 			[email],
 			async (err, results) => {
-				if (results.length > 0) {
-					return res.status(409).render("register", { errorMessage: "User already exists" });
 
+				// Checking if Email Exist in the datadase
+				if (results.length > 0) {
+					return res.status(409).render("register", { errorMessage: "Email already exists" });
 				}
 
-				//check if location exist in room table
-				const query = "SELECT * FROM room WHERE address =?";
-				db.query(query, [address], (err, result) => {
-					if (err) return res.json(err.message);
-					const query = `INSERT INTO users 
-						(full_name, email, password, user_address, room_id) VALUES(?, ?, ?, ?, ?)
-					`;
+				// checking if Phone number exist
+				db.query(
+					"SELECT * FROM users WHERE phone_number = ?",
+					[formatedPhoneNumber],
+					async (err, result) => {
+						if (err) return res.json(err.message);
 
-					//assigning the exist room id to the user.room_id
-					let roomID;
+						if (result.length !== 0) {
+							return res.render('register', { wrongNumberFormat: "Phone Number aleady exist" });
+						} else {
 
-					if (result.length !== 0) {
-						roomID = result[0].room_id;
-						db.query(
-							query,
-							[full_name, email, hashedPassword, address, roomID],
-							(err, result) => {
-								if (err) return res.json(err.message);
-								res.redirect("http://localhost:5000/login");
-							}
-						);
-					} else {
-						const query = "INSERT INTO room(address) VALUES(?)";
-						db.query(query, [address], (err, result) => {
-							if (err) return res.json(err.message);
-							//assigning the inserted room id to the user.room_id
-							roomID = result.insertId;
-
-							//inserting into the user table if the room address do not exist
-							const query =
-								"INSERT INTO users (full_name, email, password, user_address, room_id) VALUES(?, ?, ?, ?, ?)";
-							db.query(
-								query,
-								[full_name, email, hashedPassword, address, roomID],
-								(err, result) => {
+							if (!regex.test(formatedPhoneNumber) || formatedPhoneNumber.length > 13 || formatedPhoneNumber.length < 13) {
+								return res.render('register', { wrongNumberFormat: "Field must contains only numbers with 12 character." });
+							} else {
+								//check if location exist in room table
+								const query = "SELECT * FROM room WHERE address =?";
+								db.query(query, [address], (err, result) => {
 									if (err) return res.json(err.message);
-									res.redirect("http://localhost:5000/login");
-								}
-							);
-						});
+
+									const query =
+										`INSERT INTO users 
+										(full_name, email, user_address, phone_number,
+										otp_number, room_id) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY 
+										UPDATE otp_number=?
+									`;
+
+									//assigning the exist room id to the user.room_id
+									let roomID;
+
+									//OTP number
+									const otpNumber = Math.floor(100000 + Math.random() * 900000);
+
+									console.log(otpNumber);
+
+
+									if (result.length !== 0) {
+										roomID = result[0].room_id;
+
+										db.query(
+											query,
+											[full_name, email, address, formatedPhoneNumber, otpNumber, roomID, otpNumber],
+											(err, result) => {
+												if (err) return res.json(err.message);
+												res.render("login");
+											}
+										);
+
+									} else {
+										const query = "INSERT INTO room(address) VALUES(?)";
+										db.query(query, [address], (err, result) => {
+											if (err) return res.json(err.message);
+											//assigning the inserted room id to the user.room_id
+											roomID = result.insertId;
+
+											//inserting into the user table if the room address do not exist
+											const query =
+												`INSERT INTO users 
+												(full_name, email, user_address, phone_number, otp_number, room_id) VALUES(?, ?, ?, ?, ?, ?)
+												ON DUPLICATE KEY UPDATE otp_number=?
+											`;
+											db.query(
+												query,
+												[full_name, email, address, formatedPhoneNumber, otpNumber, roomID, otpNumber],
+												(err, result) => {
+													if (err) return res.json(err.message);
+													res.render("login");
+												}
+											);
+										});
+									}
+
+
+								});
+							}
+						}
 					}
-				});
+				)
+
+
 			}
+
 		);
 	} catch (err) {
 		res.status(500).json({ error: "Signup failed" });
 	}
+
 });
+
 
 // Login Route
 app.post("/login", async (req, res) => {
-	const { email, password } = req.body;
+	const { phoneNumber } = req.body;
+
+	try {
+		//removing the zero from the phone number
+		const splicePhoneNumber = phoneNumber.slice(1);
+		//formating the number to have country code
+		const formatedPhoneNumber = `${countryCode}${splicePhoneNumber}`;
+
+
+		db.query(
+			`SELECT * FROM users WHERE phone_number=?`,
+			[formatedPhoneNumber],
+			(err, result) => {
+				if (err) return console.log(err.message);
+
+				if (result.length === 0) {
+					// registeredNumber
+					res.render('login', { error: "Phone number is not registered." })
+				} else {
+					let user;
+					user = result[0];
+
+					req.session.user = user;
+					// sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
+					res.status(200).render('verify-number')
+				}
+
+			}
+		)
+
+	}
+	catch (error) {
+		res.json({ error: "Login Failed" })
+	}
+
+
+	// try {
+	// 	db.query(
+	// 		"SELECT * FROM users WHERE email = ?",
+	// 		[email],
+	// 		async (err, results) => {
+	// 			if (results.length === 0) {
+	// 				return res.render("login", { error: "Invalid email or password" });
+	// 			}
+
+	// 			const user = results[0];
+	// 			const isMatch = await bcrypt.compare(password, user.password);
+
+	// 			if (!isMatch) {
+	// 				return res.status(401).render("login", { error: "Invalid email or password" });
+	// 			}
+
+	// 			// Checking if user is registered
+	// 			req.session.isRegistered = true;
+	// 			// console.log(req.session.user = user);
+
+	// 			req.session.user = {
+	// 				id: user.id,
+	// 				name: user.full_name,
+	// 				email: user.email,
+	// 				address: user.address,
+	// 				room_id: user.room_id,
+	// 				profilePic: user.profilePic,
+	// 				role: user.role, // Add the role field here
+	// 			};
+
+	// 			res.redirect("http://localhost:5000/");
+	// 		}
+	// 	);
+	// } catch (err) {
+	// 	res.status(500).json({ error: "Login failed" });
+	// }
+});
+
+// Verify Phone Route
+app.post("/verify-number", (req, res) => {
+	const { otpNumber } = req.body;
+
+	console.log(otpNumber);
+
+	db.query(
+		`SELECT * FROM users WHERE otp_number =?`,
+		[otpNumber],
+		(err, result) => {
+			if (err) return res.json(err.message);
+
+			if (result.length > 0) {
+				console.log(req.session.user);
+				res.redirect('http://localhost:5000');
+			} else {
+				res.render('verify-number', { error: 'The code you entered is invalid' })
+			}
+		}
+	)
+})
+
+
+// Resend OTP Code
+app.post('/resend-code', (req, res) => {
+	const user = req.session.user;
+
+	const oldOtpNumber = user.otp_number;
+	const phoneNumber = user.phone_number;
+	//OTP number
+	const newOTPNumber = Math.floor(100000 + Math.random() * 900000);
+
+	// {
+	//   id: 10,
+	//   full_name: 'Abraham Dukuly',
+	//   email: 'adukuly461@gmail.com',
+	//   user_address: 'Caldwell',
+	//   phone_number: '+231886828747',
+	//   otp_number: '388290',
+	//   room_id: 3,
+	//   profilePic: null,
+
 
 	try {
 		db.query(
-			"SELECT * FROM users WHERE email = ?",
-			[email],
-			async (err, results) => {
-				if (results.length === 0) {
-					return res.render("login", { error: "Invalid email or password" });
+			`SELECT otp_number FROM users WHERE otp_number =? `,
+			[oldOtpNumber],
+			(err, result) => {
+				if (err) throw err;
+				// Updating the otp code in the database and resending a new code
+				if (result.length > 0) {
+					db.query(
+						`UPDATE users SET otp_number =? WHERE phone_number =?`,
+						[newOTPNumber, phoneNumber],
+						(err, result) => {
+							if (err) throw err.message;
+
+							// Updating the new OTP number ont
+							req.session.user.otp_number = newOTPNumber;
+
+							sendSMS(phoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${newOTPNumber}`);
+							res.render('verify-number');
+						}
+					)
+				} else {
+
 				}
 
-				const user = results[0];
-				const isMatch = await bcrypt.compare(password, user.password);
-
-				if (!isMatch) {
-					return res.status(401).render("login", { error: "Invalid email or password" });
-				}
-
-				// Checking if user is registered
-				req.session.isRegistered = true;
-				// console.log(req.session.user = user);
-
-				req.session.user = {
-					id: user.id,
-					name: user.full_name,
-					email: user.email,
-					address: user.address,
-					room_id: user.room_id,
-					profilePic: user.profilePic,
-					role: user.role, // Add the role field here
-				};
-
-				res.redirect("http://localhost:5000/");
 			}
-		);
-	} catch (err) {
-		res.status(500).json({ error: "Login failed" });
+		)
+
+	} catch (error) {
+		console.error("Failed to Resend OTP code")
 	}
-});
+})
 
 // Logout Route
 app.post("/logout", (req, res) => {
@@ -558,6 +908,25 @@ app.post("/logout", (req, res) => {
 		res.redirect("http://localhost:5000/login");
 	});
 });
+
+
+app.post("/fetch-location", (req, res) => {
+	const searchForm = req.body.locationFilter;
+
+	console.log(searchForm);
+	
+	const query = `	SELECT * FROM location WHERE location LIKE ? limit 1;
+`;
+
+	db.query(query, [`%${searchForm}%`], (err, result) => {
+		if (err) return res.json(err.message);
+
+		if(result.length ===0) return res.json('No result found')
+		return res.json(result)
+	})
+})
+
+
 
 const server = app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
