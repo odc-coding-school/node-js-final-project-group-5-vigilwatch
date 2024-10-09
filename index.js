@@ -7,6 +7,7 @@ const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
+const flash = require("connect-flash");
 const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
@@ -40,6 +41,8 @@ app.use(
 		cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 	})
 );
+
+app.use(flash());
 
 // Multer for handling image uploads
 const storage = multer.diskStorage({
@@ -293,28 +296,28 @@ app.get("/get-reported-incidents", (req, res) => {
 	});
 });
 
-// to get user location
+// // to get user location
 
-app.get("/get-user-location", async (req, res) => {
-	if (!req.session.user || !req.session.user.id) {
-		return res.status(401).json({ message: "User not logged in" });
-	}
+// app.get("/get-user-location", async (req, res) => {
+// 	if (!req.session.user || !req.session.user.id) {
+// 		return res.status(401).json({ message: "User not logged in" });
+// 	}
 
-	const userId = req.session.user.id;
-	const query = "SELECT user_address FROM users WHERE id = ?";
+// 	const userId = req.session.user.id;
+// 	const query = "SELECT user_address FROM users WHERE id = ?";
 
-	try {
-		const [result] = await db.promise().query(query, [userId]);
-		if (result.length === 0) {
-			return res.status(404).json({ message: "User location not found" });
-		}
-		const userLocation = result[0].user_address;
-		res.json({ location: userLocation });
-	} catch (err) {
-		console.error("Error fetching user location:", err);
-		res.status(500).json({ message: "Database error" });
-	}
-});
+// 	try {
+// 		const [result] = await db.promise().query(query, [userId]);
+// 		if (result.length === 0) {
+// 			return res.status(404).json({ message: "User location not found" });
+// 		}
+// 		const userLocation = result[0].user_address;
+// 		res.json({ location: userLocation });
+// 	} catch (err) {
+// 		console.error("Error fetching user location:", err);
+// 		res.status(500).json({ message: "Database error" });
+// 	}
+// });
 
 app.post("/submit-incident", (req, res) => {
 	upload(req, res, async (err) => {
@@ -328,19 +331,19 @@ app.post("/submit-incident", (req, res) => {
 
 			// Fetch user's registered location
 			const userQuery = "SELECT user_address FROM users WHERE id = ?";
-			const [userResult] = await db.promise().query(userQuery, [userId]);
-			const userLocation = userResult[0] ? userResult[0].user_address : null;
+			// const [userResult] = await db.promise().query(userQuery, [userId]);
+			// const userLocation = userResult[0] ? userResult[0].user_address : null;
 			const nameQuery = "SELECT full_name FROM users WHERE id = ?";
 			const [reporter] = await db.promise().query(nameQuery, [userId]);
 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
 
-			if (userLocation && location !== userLocation) {
-				return res
-					.status(400)
-					.send(
-						"Error: The location entered doesn't match your registered location."
-					);
-			}
+			// if (userLocation && location !== userLocation) {
+			// 	return res
+			// 		.status(400)
+			// 		.send(
+			// 			"Error: The location entered doesn't match your registered location."
+			// 		);
+			// }
 
 			// Proceed with inserting the incident
 			const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
