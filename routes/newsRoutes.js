@@ -34,7 +34,7 @@ router.post(
 					"INSERT INTO news (title, image, content, created_at, location) VALUES (?, ?, ?, ?, ?)",
 					[title, imagePath, content, created_at, location]
 				);
-			res.redirect("/news");
+			res.redirect("/news", {isRegistered: !!req.session.user});
 		} catch (error) {
 			console.error(error);
 			res.status(500).send("Server Error");

@@ -40,6 +40,7 @@
 		<div class="home-page-container">
 			<!-- Header -->
 			<%- include('includes/header') %>
+			<!-- Header Ends  -->
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -152,6 +153,47 @@
 					</div>
 				</div>
 			</section>
+
+
+			<!-- News Report -->
+			<div class="latest-news-wrapper mt-4 ml-10">
+				<h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Latest Reported Crimes</h1>
+				<section class="flex flex-col md:flex-row">
+
+					<div class="report-crime items-center bg-white w-full mr-5 rounded-xl mb-2 shadow-lg p-1">
+						<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+							<!-- Loop through each news item -->
+							<% latestNewsFetched.forEach(newsFetch => { %>
+								<div class="card border border-[#fcfcfc]">
+									<!-- News Card -->
+									<div class="bg-white rounded-lg shadow-md overflow-hidden">
+										<img class="w-full h-32 object-cover" src="<%= newsFetch.image_path %>" alt="News Image" />
+					
+										<div class="p-3">
+											<div class="flex justify-between items-center">
+												<h2 class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+													<%= newsFetch.content %>
+												</h2>
+												<p class="text-xs text-gray-500">
+													<%= new Date(newsFetch.created_at).toLocaleDateString() %>
+												</p>
+											</div>
+											<p class="text-gray-600 text-xs">
+												<%= newsFetch.location %>
+											</p>
+											<a href="/news/<%= newsFetch.id %>" class="block mt-3 bg-red-500 text-white text-center py-1 rounded hover:bg-red-600 text-sm">
+												<button class="viewmore-btn">View more</button>
+											</a>
+										</div>
+									</div>
+								</div>
+							<% }) %>
+						</article>
+					</div>
+
+				</section>
+
+			</div>
 
 			<!-- Chat Icon -->
 			<%- include('includes/chatIcon')%>

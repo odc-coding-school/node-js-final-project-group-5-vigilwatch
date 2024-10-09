@@ -1,65 +1,167 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-		<link rel="stylesheet" href="/css/styles.css" />
-	</head>
-	<body>
-		<!-- Header -->
-		<%- include('includes/header') %>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/styles.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+	<style>
+		#map {
+			width: 100%;
+			height: 300px;
+		}
+
+		.link,
+		.active {
+			transition: .5s ease-in-out;
+		}
+
+		.link:hover .active {
+			opacity: 1;
+		}
+	</style>
+</head>
+
+<body class="">
+	<!-- Header -->
+	<%- include('includes/header') %>
 		<!-- header end -->
-		<div class="container mx-auto p-6 mt-20"></div>
-	<div
-		class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
-	>
-		<div class="md:flex">
-			<!-- Profile Picture -->
-			<div class="md:flex-shrink-0">
-				<img
-					class="w-20 h-20 rounded-full border-4 border-gray-500 hover:scale-105 transition duration-300 cursor-pointer"
-					src="<%= user.profilePic ? user.profilePic : '/default-avatar.png' %>"
-					alt="Profile Picture"
-				/>
+
+		<div class="container mx-auto p-6 mt-20">
+			<div
+				class="max-w-md mx-auto fixed left-0 bottom-0 top-20 shadow-md overflow-hidden md:max-w-2xl bg-red-700">
+				<div class="md:flex text-white flex flex-col items-center pt-10">
+					<!-- Profile Picture -->
+
+					<div class="md:flex-shrink-0 bg-white rounded-full">
+						<img class="w-24 h-24 rounded-full border-4 border-gray-500 hover:scale-105 transition duration-300 cursor-pointer"
+							src="<%= user.profilePic ? user.profilePic : '/default-avatar.png' %>"
+							alt="Profile Picture" />
+					</div>
+
+					<!-- User Information -->
+					<div class="user-info">
+						<h2 class="block text-lg leading-tight font-semibold text-center capitalize p-4">
+							<%= user.full_name %>
+						</h2>
+						<p class="mt-2 p-4">
+							Location: <%= user.user_address ? user.user_address : 'Not specified' %>
+						</p>
+
+						<!-- Users navigation links back home -->
+						<div class="text-center mt-4 text-white">
+							<a href="/"
+								class="link mt-4 flex items-center hover:bg-[rgba(0,0,0,0.2)] p-2 w-full relative">
+								<div class="icon mr-3">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+										<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+									  </svg>
+
+									<div class="active absolute w-1.5 left-0 top-0 bottom-0 bg-white opacity-0"></div>
+
+								</div>
+								<p>Back to Home</p>
+							</a>
+
+							<a href="/report"
+								class="link mt-4 flex items-center hover:bg-[rgba(0,0,0,0.2)] p-2 w-full relative">
+								<div class="icon mr-3">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+										class="bi bi-grid" viewBox="0 0 16 16">
+										<path
+											d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z">
+										</path>
+									</svg>
+
+									<div class="active absolute w-1.5 left-0 top-0 bottom-0 bg-white opacity-0"></div>
+
+								</div>
+								<p>Report Incident</p>
+							</a>
+
+
+						</div>
+					</div>
+				</div>
+
 			</div>
 
-			<!-- User Information -->
-			<div class="p-8">
-				<h2
-					class="block mt-1 text-lg leading-tight font-semibold text-gray-900"
-				>
-					<%= user.full_name %>
-				</h2>
-				<p class="mt-2 text-gray-600">
-					Location: <%= user.user_address ? user.user_address : 'Not specified'
-					%>
-				</p>
+			<!-- Incident Stats -->
+			<div class="mt-4 ml-44">
+				<h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Report OverView Status</h1>
+				<section class="flex flex-col md:flex-row">
 
-				<!-- Incident Stats -->
-				<div class="mt-4">
-					<div class="flex items-center justify-between">
-						<div class="text-sm text-gray-600">Reported Incidents:</div>
+					<div class="report-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl mb-2 shadow-lg 
+					border border-[#fcfcfc] p-5">
+						<div class="reported-crime-count">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"  class="w-20 h-20 md:w-24" viewBox="0 0 16 16">
+								<path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+							  </svg>
+						</div>
+
+						<div class="text-sm text-gray-600 mt-4">Reported Incidents:</div>
 						<div class="text-lg font-semibold text-gray-800">
 							<%= reportedCount %>
 						</div>
+
 					</div>
-					<div class="flex items-center justify-between mt-2">
+
+					<!-- Pending crimes Count -->
+					<div class="pending-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl 
+					border border-[#fcfcfc] p-5 shadow-md">
+						<div class="pending-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor"
+								class="bi bi-hourglass-bottom" viewBox="0 0 16 16">
+								<path
+									d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5m2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2z" />
+							</svg>
+						</div>
+
 						<div class="text-sm text-gray-600">Pending Incidents:</div>
 						<div class="text-lg font-semibold text-gray-800">
 							<%= pendingCount %>
 						</div>
 					</div>
-				</div>
-				<!-- back home -->
-				<div class="text-center mt-4">
-					<a href="/" class="text-red-500 underline mt-4">Back to Home</a>
-				</div>
+				</section>
+
 			</div>
+
+			<!-- user Crime Report -->
+			<form action="/update-location" method="POST">
+				<div
+				class="relative flex items-center justify-center"
+				id="location-wrapper"
+			>
+				<select
+					class="address w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3"
+					name="address"
+					placeholder="Location"
+				></select>
+				<button class="text-center bg-red-600" type="submit">Update location</button>
+			</div>
+			</form>
+			<% if (success_msg) { %>
+	
+				<div class="min-h-screen flex items-center justify-center bg-gray-50">
+					<div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
+						<h2 class="text-3xl font-bold text-green-500 mb-4">
+							<%= success_msg %>
+						</h2>
+
+						<a
+							href="/user/profile"
+							class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+						>
+							Ok
+						</a>
+					</div>
+				</div>
+			<% } %>
 		</div>
-	</div>
-</div>
-	</body>
+		<script src="../scripts/location.js" defer></script>
+</body>
+
 </html>
-
-

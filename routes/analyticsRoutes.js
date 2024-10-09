@@ -181,7 +181,7 @@ router.get("/", async (req, res) => {
 		console.log(incidentsByLocation);
 		console.log(specificIncidents);
 
-		res.render("analytics", { user, incidentsByLocation, specificIncidents });
+		res.render("analytics", { user, incidentsByLocation, specificIncidents, isRegistered: !!req.session.user });
 	} catch (err) {
 		console.error("Error fetching data for analytics page: ", err);
 		res.status(500).json({ error: "Database error" });

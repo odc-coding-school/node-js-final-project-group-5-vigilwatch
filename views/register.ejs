@@ -12,7 +12,7 @@
 		<!-- header end -->
 		<!-- Header -->
 		<main
-			class="login-container flex justify-between mt-4 mx-auto ml-8 mr-8 bg-white rounded-lg flex-grow"
+			class="login-container flex justify-between mt-24 mb-10  mx-auto ml-8 mr-8 bg-white rounded-lg flex-grow"
 		>
 			<section
 				class="left-login-container w-1/2 hidden md:flex flex-col justify-end items-cente"
@@ -46,7 +46,7 @@
 					<hr class="border-customgray border-1 md:w-0 lg:w-20" />
 				</div>
 
-				<form action="/register" method="POST" id="login-form">
+				<form action="/register" method="POST" id="login-form" class="px-20">
 					<div class="flex flex-col">
 						<div
 							class="relative flex items-center justify-center"
@@ -56,8 +56,9 @@
 								class="w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3 ml-4"
 								type="text"
 								name="full_name"
-								placeholder="Enter full name"
+								placeholder="Enter username"
 							/>
+
 							<div class="absolute top-9 left-4">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +74,7 @@
 						</div>
 
 						<div
-							class="relative flex items-center justify-center"
+							class="relative"
 							id="email-wrapper"
 						>
 							<input
@@ -82,6 +83,7 @@
 								name="email"
 								placeholder="email@gmail.com"
 							/>
+
 							<div class="absolute top-9 left-4">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -96,6 +98,12 @@
 									></path>
 								</svg>
 							</div>
+
+							<% if(typeof errorMessage !== 'undefined') {%>
+								<p class="email-error text-left text-[red] font-bold">
+									<%= errorMessage %>
+								</p>
+							<%}%>
 						</div>
 
 						<div
@@ -124,45 +132,31 @@
 							</div>
 						</div>
 
-						<div class="password-wrapper relative" id="password-wrapper">
+						<div class="phone-wrapper relative" id="phone-wrapper">
 							<input
 								class="passwordInput w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3 ml-4"
-								type="password"
-								name="password"
-								placeholder="Enter password"
+								type="text"
+								name="number"
+								placeholder="Enter phone Number"
 							/>
 
 							<div class="lock absolute top-9 left-4">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="currentColor"
-									class="w-6 h-6 text-customgray"
-									viewBox="0 0 16 16"
-								>
-									<path
-										d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"
-									></path>
+
+								<svg xmlns="http://www.w3.org/2000/svg" 
+									class="w-6 h-6 text-customgray" fill="currentColor" 
+									viewBox="0 0 16 16">
+									<path fill-rule="evenodd" 
+									d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
 								</svg>
 							</div>
 
-							<div class="eye-icons absolute right-4 top-9 cursor-pointer">
-								<button class="eye-btn">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="currentColor"
-										class="eye w-6 h-6 text-customgray"
-										viewBox="0 0 16 16"
-									>
-										<path
-											d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"
-										></path>
-										<path
-											d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"
-										></path>
-									</svg>
-								</button>
-							</div>
 						</div>
+
+						<% if(typeof wrongNumberFormat !== 'undefined') {%>
+							<p class="email-error text-left text-[red] font-bold text-sm">
+								<%= wrongNumberFormat %>
+							</p>
+						<%}%>
 					</div>
 
 					<div class="btns flex flex-col justify-center items-center mt-5">
@@ -180,6 +174,7 @@
 							<a href="./login" class="text-blue-600 underline">Login</a>
 						</div>
 					</div>
+
 				</form>
 			</section>
 		</main>
