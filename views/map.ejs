@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -13,33 +13,30 @@
 
     <style>
         .suggested-area {
-            border-radius: 0 0 16px 16px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
-            /* max-width: 40%;
-            height: 24rem; */
-            background-color: red;
             margin-inline: auto;
-        }
-
-
-        #map {
-            width: 100%;
-            height: 24rem;
-            z-index: 10;
-        }
-
-        .searchbar-wrapper {
             z-index: 100;
+            opacity: 0;
         }
+
+
+			#map {
+				width: 100%;
+				height: 24rem;
+				z-index: 10;
+			}
+
+			.searchbar-wrapper {
+				z-index: 100;
+			}
 
     </style>
 </head>
 
-<body>
+	<body>
+		<!--  -->
 
-    <!--  -->
-
-    <%- include('includes/header') %>
+		<%- include('includes/header') %>
 
         <main class="mt-24 ">
             <!-- search bar -->
@@ -69,7 +66,8 @@
             </section>
 
 
-            <div class="suggested-area border w-full h-40 bg-black z-50"></div>
+            <div class="suggested-area border rounded-sm flex items-center fixed sm:w-full mt-10 mx-8
+            lg:w-[40%] lg:left-[33%] bg-white top-[25%] h-32"></div>
 
 
             <div class="bg-white p-6 rounded-lg shadow-lg">
@@ -142,14 +140,14 @@
                            data.forEach(location=>{
                                console.log(location);
                                const popupContent = `
-                <div class="popup-content">
-                    <strong>${location.incident_type}</strong><br>
-                    <img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 100px">
-                    <strong>${location.location}</strong><br>
-                    <a href="/news/${location.id}">More information</a><br>
-                    
-                </div>
-            `;
+                                    <div class="popup-content">
+                                        <strong>${location.incident_type}</strong><br>
+                                        <img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 100px">
+                                        <strong>${location.location}</strong><br>
+                                        <a href="/news/${location.id}">More information</a><br>
+                                        
+                                    </div>
+                                `;
                                const marker = L.marker([location.location_lat, location.location_lng])
 
                                .addTo(markerGroup).bindPopup(popupContent).openPopup();
@@ -159,10 +157,11 @@
                            if (data.length >0) {
                             map.setView([data[0].location_lat, data[0].location_lng])
                            
-                           } else {
-                            suggestedAreaWrapper.innerHTML = data;
                            }
-                       }
+                       }else {
+                            suggestedAreaWrapper.innerHTML = data;
+                            suggestedAreaWrapper.style.opacity = 1
+                        }
                     
                     })
                 

@@ -5,9 +5,9 @@ const path = require("path");
 const db = require("./database.js");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
-const flash = require("connect-flash")
+const flash = require("connect-flash");
 const session = require("express-session");
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 const { sendNotification } = require("./config/mailer.js");
 const setupSocketIO = require("./routes/socketIo-route.js");
 const { formatDistanceToNow } = require("date-fns");
@@ -19,9 +19,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
 
-
 //middlewire to delay the limit
-// const limiter = 
+// const limiter =
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -41,13 +40,13 @@ app.use(
 		cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
 	})
 );
-app.use(flash())
+app.use(flash());
 
 app.use((req, res, next) => {
-	res.locals.success_msg = req.flash("success")
-	res.locals.error_msg = req.flash("error")
-	next()
-})
+	res.locals.success_msg = req.flash("success");
+	res.locals.error_msg = req.flash("error");
+	next();
+});
 // Multer for handling image uploads
 const storage = multer.diskStorage({
 	destination: "./public/uploads/",
@@ -84,7 +83,7 @@ const isAdmin = require("./middleware/isAdmin");
 const mapRoute = require("./routes/map-route.js");
 
 // Import twilio library
-const twilio = require('twilio');
+const twilio = require("twilio");
 const AccountSID = process.env.ACCOUNT_SID;
 const AuthTOKEN = process.env.AUTH_TOKEN;
 
@@ -100,9 +99,7 @@ app.use("/", newsRoutes);
 app.use("/policy", policyRoutes);
 app.use("/termsOfService", termsOfServiceRoutes);
 app.use("/incident-success", incidentSuccessRoutes);
-app.use('/map', mapRoute);
-
-
+app.use("/map", mapRoute);
 
 //setting up the otp
 
@@ -111,18 +108,19 @@ const client = twilio(AccountSID, AuthTOKEN);
 
 //Send SMS function
 const sendSMS = (receipient, sender, body) => {
-	client.messages.create({
-		to: receipient,
-		from: sender,
-		body: body,
-	})
-		.then(message => {
+	client.messages
+		.create({
+			to: receipient,
+			from: sender,
+			body: body,
+		})
+		.then((message) => {
 			console.log("message sent successfully", message.sid);
 		})
-		.catch(error => {
+		.catch((error) => {
 			console.log("Error sending message", error);
-		})
-}
+		});
+};
 
 // Route to get specific news item by id
 app.get("/news/:id", async (req, res) => {
@@ -156,7 +154,11 @@ app.get("/news", async (req, res) => {
 			.query("SELECT * FROM news ORDER BY created_at DESC");
 
 		// Rendering the news view and pass the news data to the template file
-		res.render("news", { modifiedNews: news, user, isRegistered: !!req.session.user });
+		res.render("news", {
+			modifiedNews: news,
+			user,
+			isRegistered: !!req.session.user,
+		});
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Server Error");
@@ -221,7 +223,7 @@ app.get("/admin/news/import", isAdmin, (req, res) => {
 app.get("/user/profile", registeredUsers, async (req, res) => {
 	const userId = req.session.user.id;
 	const userRole = req.session.user.role;
-
+	
 
 
 	try {
@@ -252,7 +254,6 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 				[userId]
 			);
 
-
 		const latestNews = await db.promise().query(
 			`SELECT * FROM incidents join users on(users.id=incidents.userId) WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
 		`, [userId]);
@@ -266,7 +267,6 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 			(err, userReportedCrime) => {
 				if (err) throw err;
 
-
 				// Render the user profile using EJS
 				res.render("profile", {
 					user: user[0],
@@ -275,13 +275,10 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 					userReportedCrime: userReportedCrime,
 					latestNewsFetched: latestNews[0],
 					userRole,
-					isRegistered: !!req.session.user
+					isRegistered: !!req.session.user,
 				});
 			}
 		);
-
-
-
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Server Error");
@@ -331,14 +328,19 @@ app.get("/admin-dashboard", isAdmin, async (req, res) => {
 		.promise()
 		.query(
 			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
-		);
-
-	// Count pending incidents
-	const [pendingIncidents] = await db
+		)
 		.promise()
 		.query(
-			"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
+			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
 		);
+
+// Count pending incidents
+const [pendingIncidents] = await db
+	.promise()
+	.query(
+		"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
+	);
+
 
 
 	const [userCount] = await db.promise().query(countQuery);
@@ -368,7 +370,7 @@ app.get("/admin-dashboard", isAdmin, async (req, res) => {
 
 });
 
-// ================User management Render=============// 
+// ================User management Render=============//
 app.get("/user-management", isAdmin, (req, res) => {
 	const user = req.session.user || null;
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
@@ -380,14 +382,18 @@ app.get("/user-management", isAdmin, (req, res) => {
 		db.query(incidentQuery, (err, incidents) => {
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
-			res.render("user-management", { users, incidents, user, isRegistered: !!req.session.user });
+			res.render("user-management", {
+				users,
+				incidents,
+				user,
+				isRegistered: !!req.session.user,
+			});
 		});
 	});
-
 });
 
 // ================Incidents management Render=============// 
-app.get("/incidents", isAdmin, async (req, res) => {
+app.get("/incidents", isAdmin, async(req, res) => {
 	const user = req.session.user || null;
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
@@ -405,10 +411,15 @@ app.get("/incidents", isAdmin, async (req, res) => {
 		db.query(incidentQuery, (err, incidents) => {
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
-			res.render("incidents", { users, incidents, user, count: userCount[0].incidentCount, isRegistered: !!req.session.user });
+			res.render("incidents", {
+				users,
+				incidents,
+				user,
+				count: userCount[0].incidentCount,
+				isRegistered: !!req.session.user,
+			});
 		});
 	});
-
 });
 
 app.post("/admin/confirm-incident", isAdmin, (req, res) => {
@@ -455,28 +466,28 @@ app.get("/get-reported-incidents", (req, res) => {
 	});
 });
 
-// to get user location
+// // to get user location
 
-app.get("/get-user-location", async (req, res) => {
-	if (!req.session.user || !req.session.user.id) {
-		return res.status(401).json({ message: "User not logged in" });
-	}
+// app.get("/get-user-location", async (req, res) => {
+// 	if (!req.session.user || !req.session.user.id) {
+// 		return res.status(401).json({ message: "User not logged in" });
+// 	}
 
-	const userId = req.session.user.id;
-	const query = "SELECT user_address FROM users WHERE id = ?";
+// 	const userId = req.session.user.id;
+// 	const query = "SELECT user_address FROM users WHERE id = ?";
 
-	try {
-		const [result] = await db.promise().query(query, [userId]);
-		if (result.length === 0) {
-			return res.status(404).json({ message: "User location not found" });
-		}
-		const userLocation = result[0].user_address;
-		res.json({ location: userLocation });
-	} catch (err) {
-		console.error("Error fetching user location:", err);
-		res.status(500).json({ message: "Database error" });
-	}
-});
+// 	try {
+// 		const [result] = await db.promise().query(query, [userId]);
+// 		if (result.length === 0) {
+// 			return res.status(404).json({ message: "User location not found" });
+// 		}
+// 		const userLocation = result[0].user_address;
+// 		res.json({ location: userLocation });
+// 	} catch (err) {
+// 		console.error("Error fetching user location:", err);
+// 		res.status(500).json({ message: "Database error" });
+// 	}
+// });
 
 app.post("/update-location", (req, res) => {
 	const user = req.session.user || null;
@@ -489,16 +500,10 @@ app.post("/update-location", (req, res) => {
 		console.log(result);
 
 		req.session.user.user_address = address;
-		req.flash('success', "location change sucessfully!")
-		res.redirect('/user/profile')
-
+		req.flash("success", "location change sucessfully!");
+		res.redirect("/user/profile");
 	});
-
-
-
-
-})
-
+});
 
 app.post("/submit-incident", async (req, res) => {
 	upload(req, res, async (err) => {
@@ -508,17 +513,15 @@ app.post("/submit-incident", async (req, res) => {
 			}
 
 			const { userId, incidentType, description, incidentDate, location } =
-				req.body
-
+				req.body;
 
 			// Fetch user's registered location
 			const userQuery = "SELECT user_address FROM users WHERE id = ?";
-			const [userResult] = await db.promise().query(userQuery, [userId]);
-			const userLocation = userResult[0] ? userResult[0].user_address : null;
+			// const [userResult] = await db.promise().query(userQuery, [userId]);
+			// const userLocation = userResult[0] ? userResult[0].user_address : null;
 			const nameQuery = "SELECT full_name FROM users WHERE id = ?";
 			const [reporter] = await db.promise().query(nameQuery, [userId]);
 			const reporterName = reporter[0] ? reporter[0].full_name : "Unknown";
-
 
 			// if (userLocation && location !== userLocation) {
 			// 	return res
@@ -554,12 +557,11 @@ app.post("/submit-incident", async (req, res) => {
 					imagePath,
 					user.id,
 					location_lat,
-					location_lng
+					location_lng,
 				];
 
 				// Sending the sms to the Admin that a user just reported a crime
 				// sendSMS(user.phone_number, process.env.VERIFIED_PHONE, `${user.full_name} just reported a crime from ${location}`);
-
 
 				await db.promise().query(incidentsInsert, values);
 
@@ -573,15 +575,14 @@ app.post("/submit-incident", async (req, res) => {
 				});
 
 				// // Increment the notification count in session
-				req.session.notificationCount = (req.session.notificationCount || 0) + 1;
+				req.session.notificationCount =
+					(req.session.notificationCount || 0) + 1;
 
 				res.redirect("/incident-success");
 			}
-		}
-
-		catch (error) {
+		} catch (error) {
 			console.error("Error reporting incident:", error);
-			res.status(500).json({ message: "Error reporting incident" });
+			res.status(500).render("incidentError");
 		}
 	});
 });
@@ -630,8 +631,8 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-	const user = req.session.user || null;
-	res.render("login", { user });
+	// const user = req.session.user || null;
+	res.render("login");
 });
 
 app.get("/verify-number", registeredUsers, (req, res) => {
@@ -661,10 +662,11 @@ app.post("/register", async (req, res) => {
 			"SELECT * FROM users WHERE email = ?",
 			[email],
 			async (err, results) => {
-
 				// Checking if Email Exist in the datadase
 				if (results.length > 0) {
-					return res.status(409).render("register", { errorMessage: "Email already exists" });
+					return res
+						.status(409)
+						.render("register", { errorMessage: "Email already exists" });
 				}
 
 				// checking if Phone number exist
@@ -675,19 +677,26 @@ app.post("/register", async (req, res) => {
 						if (err) return res.json(err.message);
 
 						if (result.length !== 0) {
-							return res.render('register', { wrongNumberFormat: "Phone Number aleady exist" });
+							return res.render("register", {
+								wrongNumberFormat: "Phone Number aleady exist",
+							});
 						} else {
-
-							if (!regex.test(formatedPhoneNumber) || formatedPhoneNumber.length > 13 || formatedPhoneNumber.length < 13) {
-								return res.render('register', { wrongNumberFormat: "Field must contains only numbers with 12 character." });
+							if (
+								!regex.test(formatedPhoneNumber) ||
+								formatedPhoneNumber.length > 13 ||
+								formatedPhoneNumber.length < 13
+							) {
+								return res.render("register", {
+									wrongNumberFormat:
+										"Field must contains only numbers with 12 character.",
+								});
 							} else {
 								//check if location exist in room table
 								const query = "SELECT * FROM room WHERE address =?";
 								db.query(query, [address], (err, result) => {
 									if (err) return res.json(err.message);
 
-									const query =
-										`INSERT INTO users 
+									const query = `INSERT INTO users 
 										(full_name, email, user_address, phone_number,
 										otp_number, room_id) VALUES(?, ?, ?, ?, ?, ?) ON DUPLICATE KEY 
 										UPDATE otp_number=?
@@ -701,19 +710,25 @@ app.post("/register", async (req, res) => {
 
 									console.log(otpNumber);
 
-
 									if (result.length !== 0) {
 										roomID = result[0].room_id;
 
 										db.query(
 											query,
-											[full_name, email, address, formatedPhoneNumber, otpNumber, roomID, otpNumber],
+											[
+												full_name,
+												email,
+												address,
+												formatedPhoneNumber,
+												otpNumber,
+												roomID,
+												otpNumber,
+											],
 											(err, result) => {
 												if (err) return res.json(err.message);
 												res.render("login");
 											}
 										);
-
 									} else {
 										const query = "INSERT INTO room(address) VALUES(?)";
 										db.query(query, [address], (err, result) => {
@@ -722,14 +737,21 @@ app.post("/register", async (req, res) => {
 											roomID = result.insertId;
 
 											//inserting into the user table if the room address do not exist
-											const query =
-												`INSERT INTO users 
+											const query = `INSERT INTO users 
 												(full_name, email, user_address, phone_number, otp_number, room_id) VALUES(?, ?, ?, ?, ?, ?)
 												ON DUPLICATE KEY UPDATE otp_number=?
 											`;
 											db.query(
 												query,
-												[full_name, email, address, formatedPhoneNumber, otpNumber, roomID, otpNumber],
+												[
+													full_name,
+													email,
+													address,
+													formatedPhoneNumber,
+													otpNumber,
+													roomID,
+													otpNumber,
+												],
 												(err, result) => {
 													if (err) return res.json(err.message);
 													res.render("login");
@@ -737,24 +759,17 @@ app.post("/register", async (req, res) => {
 											);
 										});
 									}
-
-
 								});
 							}
 						}
 					}
-				)
-
-
+				);
 			}
-
 		);
 	} catch (err) {
 		res.status(500).json({ error: "Signup failed" });
 	}
-
 });
-
 
 // Login Route
 app.post("/login", async (req, res) => {
@@ -765,7 +780,6 @@ app.post("/login", async (req, res) => {
 		const splicePhoneNumber = phoneNumber.slice(1);
 		//formating the number to have country code
 		const formatedPhoneNumber = `${countryCode}${splicePhoneNumber}`;
-
 
 		db.query(
 			`SELECT * FROM users WHERE phone_number=?`,
@@ -779,17 +793,13 @@ app.post("/login", async (req, res) => {
 					req.session.user = null
 				} else {
 					// sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
-					res.status(200).render('verify-number')
+					res.status(200).render("verify-number");
 				}
-
 			}
-		)
-
+		);
+	} catch (error) {
+		res.json({ error: "Login Failed" });
 	}
-	catch (error) {
-		res.json({ error: "Login Failed" })
-	}
-
 
 	// try {
 	// 	db.query(
@@ -847,7 +857,7 @@ app.post("/verify-number", (req, res) => {
 				user = result[0];
 				req.session.user = user;
 				console.log(req.session.user);
-				res.redirect('http://localhost:5000');
+				res.redirect("http://localhost:5000");
 			} else {
 				req.session.user = null;
 				console.log(req.session.user);
@@ -855,12 +865,11 @@ app.post("/verify-number", (req, res) => {
 				res.render('verify-number', { error: 'The code you entered is invalid' })
 			}
 		}
-	)
-})
-
+	);
+});
 
 // Resend OTP Code
-app.post('/resend-code', (req, res) => {
+app.post("/resend-code", (req, res) => {
 	const user = req.session.user;
 
 	const oldOtpNumber = user.otp_number;
@@ -877,7 +886,6 @@ app.post('/resend-code', (req, res) => {
 	//   otp_number: '388290',
 	//   room_id: 3,
 	//   profilePic: null,
-
 
 	try {
 		db.query(
@@ -896,21 +904,22 @@ app.post('/resend-code', (req, res) => {
 							// Updating the new OTP number ont
 							req.session.user.otp_number = newOTPNumber;
 
-							sendSMS(phoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${newOTPNumber}`);
-							res.render('verify-number');
+							sendSMS(
+								phoneNumber,
+								process.env.VERIFIED_PHONE,
+								`Your VigilWatch Verification Code is ${newOTPNumber}`
+							);
+							res.render("verify-number");
 						}
-					)
+					);
 				} else {
-
 				}
-
 			}
-		)
-
+		);
 	} catch (error) {
-		console.error("Failed to Resend OTP code")
+		console.error("Failed to Resend OTP code");
 	}
-})
+});
 
 // Logout Route
 app.post("/logout", (req, res) => {
@@ -957,7 +966,7 @@ app.get("/chat", (req, res) => {
 // Handle socket connection inside the chat route
 io.on("connection", (socket) => {
 	// Join the group by the group ID
-	socket.on("join-room", roomID => {
+	socket.on("join-room", (roomID) => {
 		socket.join(roomID);
 
 		// fetching existing messages from the mrssage table
@@ -989,7 +998,6 @@ io.on("connection", (socket) => {
 					userId: prevMessage.user_id,
 					profile: prevMessage.user_profile,
 				});
-
 			});
 
 			// Emit previous messages to the user
@@ -999,7 +1007,6 @@ io.on("connection", (socket) => {
 
 	// Sending messages to all members
 	socket.on("send-message", (data) => {
-
 		const query =
 			"INSERT INTO messages(user_id, room_id, message_type) VALUES(?,?,?)";
 		db.query(query, [data.userID, data.roomID, data.message], (err) => {
@@ -1019,8 +1026,6 @@ io.on("connection", (socket) => {
 					userName: userProfile[0].full_name,
 				});
 
-
-
 				//Emit new message to the senders
 				socket.emit("new-message", {
 					userId: data.userID,
@@ -1031,8 +1036,6 @@ io.on("connection", (socket) => {
 				});
 			});
 		});
-
-
 	});
 
 	// Handle user disconnection
