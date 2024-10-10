@@ -5,6 +5,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>HubWatch - Help Keep Your Neighborhood Safe</title>
 		<link rel="stylesheet" href="css/styles.css" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="../scripts/analytics.js" defer></script>
+
+
 		
 		<% if(user && isRegistered) {%>
 			<script src="../scripts/chat.js" defer></script>
@@ -18,7 +23,13 @@
 
 			#notification-list {
 				z-index: 40; /* Lower than the icon */
-	
+			}
+
+			
+			#map {
+				width: 100%;
+				height: 24rem;
+				z-index: 10;
 			}
 
 
@@ -195,6 +206,37 @@
 
 			</div>
 
+			<!-- Map View -->
+			<main class="mt-24 ">
+				
+				<div class="bg-white p-6 rounded-lg shadow-lg">
+					<div id="map" class="w-full h-96"></div>
+				</div>
+			</main>
+
+
+			<!-- Analytics -->
+			<section class="">
+				<header class="text-black p-4 text-center font-bold text-xl mt-32">
+					 	Incident Analytics
+				</header>
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<h2 class="text-xl font-bold mb-4">
+							Number of Incidents per Location
+						</h2>
+						<canvas id="incidentsPerLocationChart"></canvas>
+					</div>
+	
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<h2 class="text-xl font-bold mb-4">
+							Specific Incidents per Location
+						</h2>
+						<canvas id="specificIncidentsPerLocationChart"></canvas>
+					</div>
+				</div>
+			</section>
+
 			<!-- Chat Icon -->
 			<%- include('includes/chatIcon')%>
 			<!-- chat Icon End -->
@@ -204,9 +246,46 @@
 			<!-- Footer End -->
 		</div>
 
-		<script>
-	
+		<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+		<script>
+
+			// getting the backend code to be use in the script
+			const crimesReport = <%- JSON.stringify(crimes) %>;
+						
+		
+						// creating the map instance or map for the view
+						const map = L.map('map').setView([6.290743, -10.760524], 10);
+						
+						L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+							maxZoom: 19,
+						}).addTo(map);
+		
+						if(Array.isArray(crimesReport)) {
+							
+							for (let i = 0; i < crimesReport.length; i++) {
+								const element = crimesReport[i];
+
+								
+								
+								element.map(location=>{
+								   console.log(location);
+								   const popupContent = `
+										<div class="popup-content">
+											<strong>${location.incident_type}</strong><br>
+											<img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 100px">
+											<strong>${location.location}</strong><br>
+											<a href="/news/${location.id}">More information</a><br>
+											
+										</div>
+									`;
+								   const marker = L.marker([location.location_lat, location.location_lng]).addTo(markerGroup).bindPopup(popupContent).openPopup();
+							   })
+								
+							}
+
+                       }
+	
 			document.getElementById('alert-button').addEventListener('click', function() {
 				const isAlerted = this.textContent.includes('Disable Alert');
 

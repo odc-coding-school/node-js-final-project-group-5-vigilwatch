@@ -329,11 +329,7 @@ app.get("/admin-dashboard", isAdmin, async (req, res) => {
 		.query(
 			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
 		)
-		.promise()
-		.query(
-			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
-		);
-
+		
 // Count pending incidents
 const [pendingIncidents] = await db
 	.promise()
@@ -709,6 +705,7 @@ app.post("/register", async (req, res) => {
 
 									//OTP number
 									const otpNumber = Math.floor(100000 + Math.random() * 900000);
+									// const otp_expiry = new Date(Date.now() +10 * 600000)
 
 									console.log(otpNumber);
 

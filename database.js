@@ -22,10 +22,12 @@ const createTables = () => {
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             full_name VARCHAR(100),
-            email VARCHAR(100),
+            email VARCHAR(100) NOT NULL UNIQUE,
             user_address VARCHAR(255),
 			phone_number VARCHAR(13) NOT NULL UNIQUE,
 			otp_number VARCHAR(6),
+			otp_expiry DATETIMEE,
+			token VARCHAR(255),
             room_id INT,
             profilePic VARCHAR(255),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
