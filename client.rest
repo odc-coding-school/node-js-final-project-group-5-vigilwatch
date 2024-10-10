@@ -1,0 +1,64 @@
+GET http://localhost:5000/map
+
+
+###
+GET http://localhost:5000/user-report-crime/10
+
+
+###
+POST http://localhost:5000/map
+
+{
+    "location":"CaldWell"
+} 
+
+
+###
+
+
+GET http://localhost:5000/chat
+###
+
+
+GET http://localhost:5000/api/room
+
+###
+GET http://localhost:5000/members
+
+###
+
+ POST http://localhost:5000/logout
+
+
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+
+{
+    "phoneNumber": "0886828747"
+}
+
+###
+POST http://localhost:5000/verify-number
+Content-Type: application/json
+
+{
+    "otpNumber": "462218"
+}
+###
+GET http://localhost:5000/search/Old Road
+Content-Type: application/json
+
+
+###
+POST http://localhost:5000/register
+Content-Type: application/json
+
+
+{
+    "full_name": "S. Abraham kanneh",
+    "email": "abrahamkanneh@gmail.com",
+    "address": "Duala",
+    "password": "abraham"
+}

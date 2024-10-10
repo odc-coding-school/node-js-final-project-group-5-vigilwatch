@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/extra-style.css">
+
+    <style>
+        .active-link {
+            text-decoration: underline;
+            color: red;
+        }
+
+        .link,
+        .active {
+            transition: .5s ease-in-out;
+        }
+
+        .link:hover .active {
+            opacity: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <%- include('includes/header') %>
+        <!-- header end -->
+
+        <div class="flex min-h-screen mt-14 pt-7">
+
+            <!-- hea -->
+           <%- include('admin-utils/sidebar')%>
+
+
+            <main class="flex-1 p-6 ml-64">
+                <h1 class="text-2xl font-bold mb-6">User Management</h1>
+
+                <section id="manage-users" class="">
+                    <h2 class="text-xl font-semibold mb-4">Users</h2>
+                    <table class="w-full bg-white border border-gray-300 table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border p-4 text-left">Name</th>
+                                <th class="border p-4 text-left">Email</th>
+                                <th class="border p-4 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user=> { %>
+                                <tr class="border">
+                                    <td class="border p-4">
+                                        <%= user.full_name %>
+                                    </td>
+                                    <td class="border p-4">
+                                        <%= user.email %>
+                                    </td>
+                                    <td class="border p-4">
+                                        <form action="/admin/promote" method="POST">
+                                            <input type="hidden" name="userId" value="<%= user.id %>">
+                                            <button type="submit"
+                                                class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Promote
+                                                to Admin</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </section>
+
+            </main>
+        </div>
+
+
+
+        <script>
+            const manageUsersLink = document.getElementById('manage-users-link');
+            const unconfirmedIncidentsLink = document.getElementById('unconfirmed-incidents-link');
+
+            manageUsersLink.addEventListener('click', () => {
+                document.getElementById('manage-users').classList.remove('hidden');
+                document.getElementById('unconfirmed-incidents').classList.add('hidden');
+            });
+
+            unconfirmedIncidentsLink.addEventListener('click', () => {
+                document.getElementById('unconfirmed-incidents').classList.remove('hidden');
+                document.getElementById('manage-users').classList.add('hidden');
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const links = document.querySelectorAll('aside nav ul li a');
+
+                links.forEach(link => {
+                    link.addEventListener('click', function () {
+                        // Remove active class from all links
+                        links.forEach(l => l.classList.remove('active-link'));
+
+                        // Add active class to the clicked link
+                        this.classList.add('active-link');
+                    });
+                });
+            });
+
+        </script>
+</body>
+
+</html>

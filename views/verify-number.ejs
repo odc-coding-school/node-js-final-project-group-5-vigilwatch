@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Verify number</title>
+	<link href="/css/styles.css" rel="stylesheet" />
+
+	<style>
+		.error {
+			color: red;
+			font-weight: bold;
+			font-size: 14px;
+		}
+	</style>
+</head>
+
+<body class="bg-slate-200">
+
+	<main
+		class="login-container flex items-center justify-center mt-24 mb-10 mx-12 md:mx-32 lg:mx-72 bg-white rounded-lg p-10">
+
+		<section class="rignt-login-section flex flex-col justify-between items-center mx-auto">
+			<div class="logo-wrapper flex flex-col items-center pt-4">
+				<img class="h-14 sm:h-16 md:h-20 lg:h-24" src="../logo.png" alt="" />
+				<h1 class="text-sm md:text-lg lg:text-2xl xl:text-lg mt-3">
+					Verify your Identity
+				</h1>
+			</div>
+
+			<div class="flex items-center justify-center mt-5" id="login-description-wrapper">
+				<div class="text-gray-600 text-xs sm:text-xs md:text-sm lg:text-lg">
+					We have send text message to:
+				</div>
+			</div>
+
+			<form action="/verify-number" method="POST" id="verify-form" class="px-20">
+				<div class="flex flex-col">
+					
+					<div class="relative flex items-center justify-center" id="otp-wrapper">
+						<input class="w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3"
+							type="text" name="otpNumber" placeholder="Enter the 6-digit code*" />
+
+					</div>
+
+				</div>
+
+				<!-- Display error message if it exists -->
+				<% if (typeof error !=='undefined' ) { %>
+					<p class="error">
+						<%= error %>
+					</p>
+					<% } %>
+
+						<div class="btns flex flex-col justify-center items-center mt-5 pb-5">
+							<button class="login-btn text-white bg-red-600 rounded-lg w-60 mb-4 p-1 text-lg"
+								type="submit">
+								Verify Number
+							</button>
+
+						</div>
+			</form>
+
+			<div class="btns flex flex-col justify-center items-center mt-5">
+				<span class="text-center pb-6 text-sm md:text-lg">Didn't receive a code?
+					<form action="resend-code" method="post">
+
+						<button type="submit" class="text-blue-600 underline">Resend</button>
+					</form>
+				</span>
+			</div>
+		</section>
+
+
+	</main>
+	<!-- Footer Start -->
+	<%- include('includes/footer')%>
+		<!-- Footer Ends -->
+
+
+		<script>
+
+		</script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.current-user-bg {
+    background-color: blue;
+    color: white;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.members-bg {
+    background-color: #e5e7eb;
+    color: black;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.align-right {
+    display: flex;
+    align-items: flex-end;
+}
+
+
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    margin-inline-end: auto;
+    position: fixed;
+    width: 65%;
+    transform: translateY(330px);
+
+}
+
+.input-field {
+    flex: 1px;
+    border-radius: 10px;
+    /* border: 1px solid rgba(255, 255, 255, 0.13); */
+    color: black;
+    resize: none;
+    white-space: none;
+    font-size: 18px;
+}
+
+
+/* toogle navbar */
+.toogle-container {
+    
+    position: fixed;
+    top: 85px;
+    right: 0;
+    width: 250px;
+    bottom: 0;
+    z-index: 200;
+    /* animation: hide 0.5s; */
+    transition: 1000ms ease-in-out;
+}
+
+ul {
+    display: flex;
+    align-items: center;
+}
+
+
+ul .navbar-link {
+    width: 100%;
+    margin-bottom: 5px;
+
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 1rem;
+}
+
+.navbar-link:hover {
+    background-color: rgba(0, 0, 0, .2);
+}
+
+ul li {
+
+    padding-left: 10px;
+}
+
+.menu {
+    z-index: 10;
+    transition: all cubic-bezier(0.075, 0.82, 0.165, 1) 2s;
+    color: white;
+    cursor: pointer;
+    margin-left: 2rem;
+
+}
+
+.menu:hover {
+    transform: rotate(90deg);
+}
+
+
+.toogle-container.show {
+    /* display: block; */
+    right: 0px;
+    opacity: 1;
+}
+
+.toogle-container:not(.show) {
+    /* display: none; */
+    right: -300px;
+    opacity: 0;
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/extra-style.css" />
+    <% if(user) {%>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../scripts/chat.js" defer></script>
+        <%}%>
+
+
+            <style>
+                .chat-message-holder {
+                    border-radius: 10px;
+                }
+            </style>
+
+</head>
+
+<body class="flex flex-col h-screen bg-neutral-900 bg-opacity-80">
+    <!-- Header -->
+    <%- include('includes/header') %>
+        <!-- header end -->
+
+        <main class="chat-box bg-gray-100 p-4 flex-grow flex mt-24 fixed right-20 left-20 bottom-0 top-0 rounded-lg">
+            <a href="./" class="fixed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                    class="bi bi-backspace" viewBox="0 0 16 16">
+                    <path
+                        d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z" />
+                    <path
+                        d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
+                </svg>
+            </a>
+
+
+            <aside class="chat-member hidden md:block mt-5">
+                <div class="searchbar-container">
+                    <h2 class="chat-room text-lg font-semibold mb-3 text-gray-700">Neighbor's Chat</h2>
+                    <span class="p-2 text-lg w-full">group member</span>
+                    <div class="input-wrapper border-2 border-t-0 border-l-0 border-r-0">
+                    </div>
+
+                </div>
+
+                <div class="group-members h-72  overflow-auto">
+
+                    <!-- <div class="member-wrapper flex items-center hover:bg-gray-600 cursor-pointer mt-5">
+                        <img class="profile w-10 h-10 rounded-full object-cover mr-3" src="../profile.jpg"
+                            alt="profile-image">
+                        <span class="member font-semibold">Abraham Dukuly</span>
+                    </div> -->
+                </div>
+
+            </aside>
+
+
+
+            <section class="chat-message flex-1 p-2.5 pb-5 overflow-auto h-72 overflow-x-hidden">
+                <section class="chat-message-holder ml-10 ">
+                    <!-- <div class="message-top flex flex-col">
+                        <div class="flex items-end">
+                            <img class="w-10 h-10 rounded-full object-cover mr-3" src="../profile.jpg"
+                                alt="profile-image">
+
+                                <div class="flex flex-col">
+                                    <span class="username text-red-700 font-semibold">Abraham</span>
+                                    <span
+                                        class="message text-sm md:text-lg bg-gray-200 text-black px-3 py-2 rounded-3xl max-w-72">Lorem
+                                        ipsum dolor sit, non?</span>
+                                </div>
+                        </div>
+                        <div class="timestamp text-gray-400">1 hour ago</div>
+                    </div> -->
+
+                </section>
+
+
+
+                <form id="form" class="fixed top-20">
+                    <div class="input-wrapper">
+
+                        <textarea id="input-field" cols="2"
+                            class="w-full border border-gray-300 rounded-lg input-field px-3 pt-5"
+                            placeholder="Type something...."></textarea>
+
+
+                        <button id="send-btn" class="text-lg p-2 bg-blue-700
+                        border-none text-white rounded-lg cursor-pointer mr-20">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                                class="bi bi-send-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
+                            </svg>
+                        </button>
+
+                    </div>
+
+                </form>
+            </section>
+
+        </main>
+
+</body>
+
+
+</html>

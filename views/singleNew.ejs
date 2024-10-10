@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>News Details</title>
+		<link rel="stylesheet" href="/css/styles.css" />
+	</head>
+	<body class="bg-gray-100">
+		<!-- Include Header -->
+		<%- include('includes/header') %>
+
+		<div
+			class="container mx-auto p-6 bg-white rounded-lg shadow-md max-w-4xl mt-24 mb-10"
+		>
+			<h2 class="text-3xl font-bold mb-4"><%= news.title %></h2>
+			<img
+				class="w-full h-64 object-cover mb-4"
+				src="<%= news.image %>"
+				alt="News Image"
+			/>
+			<p class="text-sm text-gray-500 mb-2">Date: <%= news.created_at %></p>
+			<p class="text-sm text-gray-500 mb-4">Location: <%= news.location %></p>
+			<p class="text-lg text-gray-700"><%= news.content %></p>
+			<a
+				href="/news"
+				class="block mt-6 bg-red-500 text-white text-center py-2 rounded hover:bg-red-600"
+			>
+				Back to News Center
+			</a>
+		</div>
+
+		<!-- Include Footer -->
+		<%- include('includes/footer') %>
+	</body>
+</html>
