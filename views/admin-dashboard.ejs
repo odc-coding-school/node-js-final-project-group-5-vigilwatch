@@ -41,16 +41,14 @@
                     <!-- Incident Stats -->
                     <div class="mt-4">
                         <h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Welcome to VigilWatch</h1>
-                        <section class="flex flex-col md:flex-row">
+                        <section class="grid gap-10 grid-rows-1 md:grid-cols-2">
 
                             <div class="report-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl mb-2 shadow-lg 
                             border border-[#fcfcfc] p-5">
                                 <div class="reported-crime-count">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
-                                        class="bi bi-people-fill text-red-700" viewBox="0 0 16 16">
-                                        <path
-                                            d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-file-earmark-text-fill text-red-700" viewBox="0 0 16 16">
+                                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"/>
+                                      </svg>
                                 </div>
 
                                 <div class="text-sm text-gray-600 mt-4">Reported Incidents:</div>
@@ -76,6 +74,40 @@
                                     <%=pendingIncidents %>
                                 </div>
                             </div>
+                            
+                            <div class="report-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl mb-2 shadow-lg 
+                            border border-[#fcfcfc] p-5">
+                                <div class="reported-crime-count">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
+                                        class="bi bi-people-fill text-red-700" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                                    </svg>
+                                </div>
+
+                                <div class="text-sm text-gray-600 mt-4">Users:</div>
+                                <div class="text-2xl font-semibold text-gray-800">
+                                    <%=userCount%>
+                                </div>
+
+                            </div>
+
+                            <!-- Pending crimes Count -->
+                            <div class="pending-crime flex flex-col items-center bg-white mr-5 w-full rounded-xl 
+                            border border-[#fcfcfc] p-5 shadow-md">
+                                <div class="pending-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-newspaper text-red-700" viewBox="0 0 16 16">
+                                        <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z"/>
+                                        <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z"/>
+                                      </svg>
+                                </div>
+
+                                <div class="text-sm text-gray-600">Imported News:</div>
+                                <div class="text-2xl font-semibold text-gray-800">
+                                    <%=newsCount %>
+                                </div>
+                            </div>
+
                         </section>
 
                     </div>

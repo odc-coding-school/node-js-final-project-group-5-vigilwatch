@@ -43,7 +43,7 @@ app.use(
 );
 app.use(flash())
 
-app.use((req, res, next)=> {
+app.use((req, res, next) => {
 	res.locals.success_msg = req.flash("success")
 	res.locals.error_msg = req.flash("error")
 	next()
@@ -221,7 +221,7 @@ app.get("/admin/news/import", isAdmin, (req, res) => {
 app.get("/user/profile", registeredUsers, async (req, res) => {
 	const userId = req.session.user.id;
 	const userRole = req.session.user.role;
-	
+
 
 
 	try {
@@ -233,8 +233,8 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 				[userId]
 			);
 
-			console.log(user);
-			
+		console.log(user);
+
 
 		// Count reported incidents
 		const [reportedIncidents] = await db
@@ -258,7 +258,7 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 		`, [userId]);
 
 
-		
+
 
 		db.query(
 			`SELECT * FROM incidents WHERE userId =?`,
@@ -316,32 +316,36 @@ app.post("/admin/promote", isAdmin, (req, res) => {
 });
 
 // ================Dashboard Render=============// 
-app.get("/admin-dashboard", isAdmin, async(req, res) => {
+app.get("/admin-dashboard", isAdmin, async (req, res) => {
 	const user = req.session.user || null;
 	const userId = req.session.user.id;
-
 
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
 	const countQuery = "SELECT COUNT(*) AS userCounts FROM users "; //number of the registered users
+	const importedNewsQuery= "SELECT COUNT(*) AS userCounts FROM news "; //number of the Imported News
+
+	
 	// Count reported incidents
 	const [reportedIncidents] = await db
-	.promise()
-	.query(
-		"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
-	);
+		.promise()
+		.query(
+			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
+		);
 
-// Count pending incidents
-const [pendingIncidents] = await db
-	.promise()
-	.query(
-		"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
-	);
+	// Count pending incidents
+	const [pendingIncidents] = await db
+		.promise()
+		.query(
+			"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
+		);
+
 
 	const [userCount] = await db.promise().query(countQuery);
+	const [newsCount] = await db.promise().query(importedNewsQuery);
 	console.log(reportedIncidents[0].count);
 	console.log(pendingIncidents[0].count);
-	
+
 
 	db.query(userQuery, (err, users) => {
 		if (err) return res.status(500).send("Error retrieving users.");
@@ -349,17 +353,19 @@ const [pendingIncidents] = await db
 		db.query(incidentQuery, (err, incidents) => {
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
-			res.render("admin-dashboard", { users, incidents, user, 
-				userCount:userCount[0].userCounts,
-				reportedReported:reportedIncidents[0].count,
-				pendingIncidents:pendingIncidents[0].count,
+			res.render("admin-dashboard", {
+				users, incidents, user,
+				userCount: userCount[0].userCounts,
+				newsCount: newsCount[0].userCounts,
+				reportedReported: reportedIncidents[0].count,
+				pendingIncidents: pendingIncidents[0].count,
 				isRegistered: !!req.session.user
 			});
 		});
 	});
-	
-	
-	
+
+
+
 });
 
 // ================User management Render=============// 
@@ -377,11 +383,11 @@ app.get("/user-management", isAdmin, (req, res) => {
 			res.render("user-management", { users, incidents, user, isRegistered: !!req.session.user });
 		});
 	});
-	
+
 });
 
 // ================Incidents management Render=============// 
-app.get("/incidents", isAdmin, async(req, res) => {
+app.get("/incidents", isAdmin, async (req, res) => {
 	const user = req.session.user || null;
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
@@ -389,9 +395,9 @@ app.get("/incidents", isAdmin, async(req, res) => {
 
 	const [userCount] = await db.promise().query(countQuery);
 
-	
+
 	console.log(userCount[0].incidentCount);
-	
+
 
 	db.query(userQuery, (err, users) => {
 		if (err) return res.status(500).send("Error retrieving users.");
@@ -399,10 +405,10 @@ app.get("/incidents", isAdmin, async(req, res) => {
 		db.query(incidentQuery, (err, incidents) => {
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
-			res.render("incidents", { users, incidents, user, count:userCount[0].incidentCount, isRegistered: !!req.session.user });
+			res.render("incidents", { users, incidents, user, count: userCount[0].incidentCount, isRegistered: !!req.session.user });
 		});
 	});
-	
+
 });
 
 app.post("/admin/confirm-incident", isAdmin, (req, res) => {
@@ -474,23 +480,23 @@ app.get("/get-user-location", async (req, res) => {
 
 app.post("/update-location", (req, res) => {
 	const user = req.session.user || null;
-	const {address} = req.body;
+	const { address } = req.body;
 
 	const userQuery = `UPDATE users SET user_address =?  WHERE id = ?`;
-	db.query(userQuery, [address, user.id], (err, result)=>{
+	db.query(userQuery, [address, user.id], (err, result) => {
 
-	
+
 		console.log(result);
 
 		req.session.user.user_address = address;
 		req.flash('success', "location change sucessfully!")
-		res.redirect('/user/profile') 
-		
+		res.redirect('/user/profile')
+
 	});
 
-	
 
-	
+
+
 })
 
 
@@ -628,7 +634,7 @@ app.get("/login", (req, res) => {
 	res.render("login", { user });
 });
 
-app.get("/verify-number", (req, res) => {
+app.get("/verify-number", registeredUsers, (req, res) => {
 	res.render('verify-number')
 })
 
@@ -770,11 +776,8 @@ app.post("/login", async (req, res) => {
 				if (result.length === 0) {
 					// registeredNumber
 					res.render('login', { error: "Phone number is not registered." })
+					req.session.user = null
 				} else {
-					let user;
-					user = result[0];
-
-					req.session.user = user;
 					// sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
 					res.status(200).render('verify-number')
 				}
@@ -838,10 +841,17 @@ app.post("/verify-number", (req, res) => {
 		(err, result) => {
 			if (err) return res.json(err.message);
 
+			let user;
+
 			if (result.length > 0) {
+				user = result[0];
+				req.session.user = user;
 				console.log(req.session.user);
 				res.redirect('http://localhost:5000');
 			} else {
+				req.session.user = null;
+				console.log(req.session.user);
+				
 				res.render('verify-number', { error: 'The code you entered is invalid' })
 			}
 		}
@@ -910,19 +920,20 @@ app.post("/logout", (req, res) => {
 });
 
 
-app.post("/fetch-location", (req, res) => {
-	const searchForm = req.body.locationFilter;
+app.get("/search/:query", (req, res) => {
+	const param = req.params.query;
 
-	console.log(searchForm);
-	
-	const query = `	SELECT * FROM location WHERE location LIKE ? limit 1;
+
+	console.log(param);
+
+	const query = `	SELECT * FROM incidents WHERE location LIKE ? limit 5;
 `;
 
-	db.query(query, [`%${searchForm}%`], (err, result) => {
+	db.query(query, [`%${param}%`], (err, result) => {
 		if (err) return res.json(err.message);
 
-		if(result.length ===0) return res.json('No result found')
-		return res.json(result)
+		if (result.length === 0) return res.json('No result found')
+		return res.json(result);
 	})
 })
 

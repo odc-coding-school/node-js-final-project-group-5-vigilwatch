@@ -5,8 +5,14 @@ const db = require("../database.js");
 
 router.get('/', async (req, res) => {
     const user = req.session.user || null;
+    const newsId = req.params.id;
     let query = `SELECT * FROM incidents WHERE status = "confirmed"`;
-    
+
+    const [news] = await db.promise().query("SELECT * FROM news WHERE id = ?", [newsId]);
+
+		if (news.length > 0) {
+			// If news item is found, render a template with the news details
+        }
     db.query(query, (err, result) => {
         if (err) return res.status(500).json(err.message);
          

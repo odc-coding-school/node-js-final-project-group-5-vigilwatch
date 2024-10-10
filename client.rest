@@ -47,12 +47,10 @@ Content-Type: application/json
     "otpNumber": "462218"
 }
 ###
-POST http://localhost:5000/fetch-location
+GET http://localhost:5000/search/Old Road
 Content-Type: application/json
 
-{
-    "locationFilter": "Bassa"
-}
+
 ###
 POST http://localhost:5000/register
 Content-Type: application/json
