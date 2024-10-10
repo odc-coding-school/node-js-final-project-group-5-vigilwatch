@@ -8,9 +8,14 @@ router.get("/", async(req, res) => {
 	const hasAlerted = req.session.hasAlerted || false;
 
 	// Latest news
+	const newsId = req.params.id;
 	const latestNews = await db.promise().query(
 		`SELECT * FROM incidents WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
 	`);
+
+    const [news] = await db.promise().query("SELECT * FROM news WHERE id = ?", [newsId]);
+	
+	const homeMap = await db.promise().query(`SELECT * FROM incidents WHERE status = "confirmed"`);
 
 	const user = req.session.user || null;
 	res.render("home", {
@@ -19,6 +24,8 @@ router.get("/", async(req, res) => {
 		notificationCount,
 		hasAlerted,
 		latestNewsFetched: latestNews[0],
+		crimes: homeMap, 
+		isRegistered: !!req.session.user
 
 	});
 });
