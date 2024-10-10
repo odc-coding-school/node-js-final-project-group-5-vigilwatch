@@ -656,6 +656,8 @@ app.post("/register", async (req, res) => {
 
 	console.log(formatedPhoneNumber);
 
+
+
 	try {
 		//checke if email exist in the user table
 		db.query(
@@ -792,7 +794,7 @@ app.post("/login", async (req, res) => {
 					res.render('login', { error: "Phone number is not registered." })
 					req.session.user = null
 				} else {
-					// sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
+					sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
 					res.status(200).render("verify-number");
 				}
 			}

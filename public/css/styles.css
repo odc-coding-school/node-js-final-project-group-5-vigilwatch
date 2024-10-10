@@ -648,60 +648,8 @@ video {
   top: 2.25rem;
 }
 
-.top-12 {
-  top: 3rem;
-}
-
-.left-32 {
-  left: 8rem;
-}
-
-.right-10 {
-  right: 2.5rem;
-}
-
-.right-32 {
-  right: 8rem;
-}
-
-.top-32 {
-  top: 8rem;
-}
-
-.top-44 {
-  top: 11rem;
-}
-
-.top-40 {
-  top: 10rem;
-}
-
-.top-\[\] {
-  top: ;
-}
-
-.top-\[20\%\] {
-  top: 20%;
-}
-
-.top-\[60\%\] {
-  top: 60%;
-}
-
-.top-\[30\%\] {
-  top: 30%;
-}
-
 .top-\[25\%\] {
   top: 25%;
-}
-
-.top-\[28\%\] {
-  top: 28%;
-}
-
-.top-\[26\%\] {
-  top: 26%;
 }
 
 .z-20 {
@@ -931,10 +879,6 @@ video {
   height: 8rem;
 }
 
-.h-40 {
-  height: 10rem;
-}
-
 .h-6 {
   height: 1.5rem;
 }
@@ -1077,10 +1021,6 @@ video {
 
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .grid-rows-1 {
@@ -1839,24 +1779,12 @@ video {
 }
 
 @media (min-width: 640px) {
-  .sm\:left-\[20\%\] {
-    left: 20%;
-  }
-
   .sm\:h-16 {
     height: 4rem;
   }
 
   .sm\:w-full {
     width: 100%;
-  }
-
-  .sm\:w-3\/4 {
-    width: 75%;
-  }
-
-  .sm\:grid-rows-1 {
-    grid-template-rows: repeat(1, minmax(0, 1fr));
   }
 
   .sm\:text-xs {
@@ -1866,10 +1794,6 @@ video {
 }
 
 @media (min-width: 768px) {
-  .md\:left-\[20\%\] {
-    left: 20%;
-  }
-
   .md\:mx-32 {
     margin-left: 8rem;
     margin-right: 8rem;
@@ -1881,10 +1805,6 @@ video {
 
   .md\:flex {
     display: flex;
-  }
-
-  .md\:grid {
-    display: grid;
   }
 
   .md\:hidden {
@@ -1907,10 +1827,6 @@ video {
     width: 15rem;
   }
 
-  .md\:w-1\/2 {
-    width: 50%;
-  }
-
   .md\:max-w-2xl {
     max-width: 42rem;
   }
@@ -1919,20 +1835,12 @@ video {
     flex-shrink: 0;
   }
 
-  .md\:grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .md\:grid-rows-1 {
-    grid-template-rows: repeat(1, minmax(0, 1fr));
   }
 
   .md\:flex-row {
@@ -1957,14 +1865,6 @@ video {
 @media (min-width: 1024px) {
   .lg\:left-\[30\%\] {
     left: 30%;
-  }
-
-  .lg\:left-\[32\%\] {
-    left: 32%;
-  }
-
-  .lg\:left-\[34\%\] {
-    left: 34%;
   }
 
   .lg\:left-\[33\%\] {
