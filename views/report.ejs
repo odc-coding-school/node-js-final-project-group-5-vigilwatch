@@ -159,21 +159,19 @@
 				}
 			});
 
-			// to fetch user location 
-			// document.getElementById("useMyLocation").addEventListener("click", async () => {
-			// 	try {
-			// 	const response = await fetch("/get-user-location");
-			// 	const data = await response.json();
-			// 	if (data.location) {
-			// 		document.getElementById("location").value = data.location;
-			// 	} else {
-			// 		alert("Error fetching your location.");
-			// 	}
-			// 	} catch (error) {
-			// 	console.error("Error:", error);
-			// 	}
-			// });
+		const form = document.getElementById('incidentform');
+		const incidentDateInput = document.getElementById('incidentDate');
 
+		form.addEventListener('submit', (e) => {
+			const selectedDate = new Date(incidentDateInput.value);
+			const currentDate = new Date();
+
+			// Check if the selected date is in the future
+			if (selectedDate > currentDate) {
+				e.preventDefault(); // Prevent form submission
+				alert('Incident date and time cannot be in the future.');
+			}
+		});
 
 		</script>
 		<script src="../scripts/location.js" defer></script>

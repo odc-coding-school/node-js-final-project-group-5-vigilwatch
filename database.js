@@ -10,13 +10,12 @@ const db = mysql2.createConnection({
 
 db.connect(function (err) {
 	if (err) return console.log(err.message);
-	db.query(`CREATE DATABASE IF NOT EXISTS vigilwatch_database`, function (err) {
+	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database`, function (err) {
 		if (err) return console.log(err.message);
 		return console.log("database is created successfully");
 	});
 	console.log("database connected");
 });
-
 
 const createTables = () => {
 	const createUsersTable = `
@@ -177,6 +176,14 @@ const createTables = () => {
 		}
 	});
 
+	// db.query(`ALTER TABLE users DROP COLUMN password `, (err, result) => {
+	// 	if (err) {
+	// 		console.log("Error altering incidents table:", err.message);
+	// 	} else {
+	// 		console.log("link drop");
+	// 	}
+	// });
+
 	db.query(
 		`ALTER TABLE users ADD COLUMN role INT DEFAULT 0;`,
 		(err, result) => {
@@ -184,6 +191,28 @@ const createTables = () => {
 				console.log("Error altering users table:", err.message);
 			} else {
 				console.log("Added 'role' column to users table");
+			}
+		}
+	);
+
+	db.query(
+		`ALTER TABLE users ADD COLUMN phone_number VARCHAR(13) NOT NULL UNIQUE;`,
+		(err, result) => {
+			if (err) {
+				console.log("Error altering users table:", err.message);
+			} else {
+				console.log("Added 'phone_number' column to users table");
+			}
+		}
+	);
+
+	db.query(
+		`ALTER TABLE users ADD COLUMN otp_number VARCHAR(6);`,
+		(err, result) => {
+			if (err) {
+				console.log("Error altering users table:", err.message);
+			} else {
+				console.log("Added 'otp_number' column to users table");
 			}
 		}
 	);
