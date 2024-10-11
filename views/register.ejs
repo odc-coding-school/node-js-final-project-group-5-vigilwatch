@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Signup</title>
+		<link href="/css/styles.css" rel="stylesheet" />
+	</head>
+
+	<body class="bg-slate-200">
+		<%- include('includes/header') %>
+		<!-- header end -->
+		<!-- Header -->
+		<main
+			class="login-container flex justify-between mt-24 mb-10  mx-auto ml-8 mr-8 bg-white rounded-lg flex-grow"
+		>
+			<section
+				class="left-login-container w-1/2 hidden md:flex flex-col justify-end items-cente"
+			>
+				<div class="text-center text-sm md:text-lg lg:text-2xl mb-12 mt-24">
+					"Crime is forbidden, Report It"
+				</div>
+				<img
+					class="bg-img md:w-60 lg:w-3/5 h-2/3 ml-auto mr-auto opacity-55"
+					src="../background.png"
+					alt=""
+				/>
+			</section>
+
+			<section
+				class="rignt-login-section flex flex-col justify-center items-center mx-auto"
+			>
+				<div class="logo-wrapper flex flex-col items-center pt-4">
+					<img class="h-14 sm:h-16 md:h-20 lg:h-24" src="../logo.png" alt="" />
+				</div>
+
+				<div
+					class="flex items-center justify-center mt-5"
+					id="login-description-wrapper"
+				>
+					<hr class="border-customgray border-1 md:w-0 lg:w-20" />
+
+					<div class="text-customgray text-xs sm:text-xs md:text-sm lg:text-lg">
+						Register
+					</div>
+					<hr class="border-customgray border-1 md:w-0 lg:w-20" />
+				</div>
+
+				<form action="/register" method="POST" id="login-form" class="px-20">
+					<div class="flex flex-col">
+						<div
+							class="relative flex items-center justify-center"
+							id="fullname-wrapper"
+						>
+							<input
+								class="w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3 ml-4"
+								type="text"
+								name="full_name"
+								placeholder="Enter username"
+							/>
+
+							<div class="absolute top-9 left-4">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="currentColor"
+									class="w-6 h-6 text-customgray"
+									viewBox="0 0 16 16"
+								>
+									<path
+										d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"
+									></path>
+								</svg>
+							</div>
+						</div>
+
+						<div
+							class="relative"
+							id="email-wrapper"
+						>
+							<input
+								class="w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3 ml-4"
+								type="email"
+								name="email"
+								placeholder="email@gmail.com"
+							/>
+
+							<div class="absolute top-9 left-4">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									fill="currentColor"
+									class="w-6 h-6 text-customgray"
+									viewBox="0 0 16 16"
+								>
+									<path
+										d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"
+									></path>
+								</svg>
+							</div>
+
+							<% if(typeof errorMessage !== 'undefined') {%>
+								<p class="email-error text-left text-[red] font-bold">
+									<%= errorMessage %>
+								</p>
+							<%}%>
+						</div>
+
+						<div
+							class="relative flex items-center justify-center"
+							id="location-wrapper"
+						>
+							<select
+								class="address w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3"
+								name="address"
+								placeholder="Location"
+							></select>
+
+							<div class="absolute top-9 left-4">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									fill="currentColor"
+									class="w-6 h-6 text-customgray"
+									viewBox="0 0 16 16"
+								>
+									<path
+										d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"
+									/>
+								</svg>
+							</div>
+						</div>
+
+						<div class="phone-wrapper relative" id="phone-wrapper">
+							<input
+								class="passwordInput w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3 ml-4"
+								type="text"
+								name="number"
+							
+								placeholder="Enter phone Number"
+							/>
+
+							<div class="lock absolute top-9 left-4">
+
+								<svg xmlns="http://www.w3.org/2000/svg" 
+									class="w-6 h-6 text-customgray" fill="currentColor" 
+									viewBox="0 0 16 16">
+									<path fill-rule="evenodd" 
+									d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
+								</svg>
+							</div>
+
+						</div>
+
+						<% if(typeof wrongNumberFormat !== 'undefined') {%>
+							<p class="email-error text-left text-[red] font-bold text-sm">
+								<%= wrongNumberFormat %>
+							</p>
+						<%}%>
+					</div>
+
+					<div class="btns flex flex-col justify-center items-center mt-5">
+						<button
+							class="login-btn text-white bg-red-600 rounded-lg w-60 mb-4 p-1 text-lg"
+							type="submit"
+						>
+							Sign up
+						</button>
+
+						<hr class="border-1 w-80 h-.5 bg-customgray" />
+
+						<div class="text-center pb-6 text-xs md:text-sm">
+							Don't have an account?
+							<a href="./login" class="text-blue-600 underline">Login</a>
+						</div>
+					</div>
+
+				</form>
+			</section>
+		</main>
+		<script src="../scripts/location.js" defer></script>
+	</body>
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Report Incident</title>
+		<link rel="stylesheet" href="css/styles.css" />
+	</head>
+	<body>
+		<!-- Header -->
+		<%- include('includes/header') %>
+		<!-- header end -->
+		<section class="mt-24 bg-gray-50">
+			<div class="container mx-auto px-4">
+				<h2 class="text-3xl font-bold text-center mb-12">Report an Incident</h2>
+				<form
+					id="incidentform"
+					action="/submit-incident"
+					method="POST"
+					enctype="multipart/form-data"
+					class="max-w-lg mx-auto bg-white p-8 shadow-lg rounded-lg"
+				>
+					<div class="mb-6">
+						<label
+							class="block text-gray-700 font-semibold mb-2"
+							for="incidentType"
+							>Incident Type</label
+						>
+						<select
+							id="incidentType"
+							name="incidentType"
+							class="w-full p-3 border border-gray-300 rounded-lg"
+						>
+							<option>Theft</option>
+							<option>Rape</option>
+							<option>Vandalism</option>
+							<option>Fire</option>
+							<option>Suspicious Activity</option>
+							<option>Fraud</option>
+						</select>
+					</div>
+
+					<div class="mb-6">
+						<label
+							class="block text-gray-700 font-semibold mb-2"
+							for="description"
+							>Description</label
+						>
+						<textarea
+							id="description"
+							name="description"
+							rows="4"
+							class="w-full p-3 border border-gray-300 rounded-lg"
+							placeholder="Provide details of the incident"
+						></textarea>
+					</div>
+
+					<div class="mb-6">
+						<label
+							class="block text-gray-700 font-semibold mb-2"
+							for="incidentDate"
+							>Date & Time</label
+						>
+						<input
+							type="datetime-local"
+							id="incidentDate"
+							name="incidentDate"
+							class="w-full p-3 border border-gray-300 rounded-lg"
+						/>
+					</div>
+
+					<input type="hidden" name="userId" value="<%= user.id %>" />
+
+					<div class="mb-6">
+						<label class="block text-gray-700 font-semibold mb-2" for="location"
+							>Location</label
+						>
+						<!-- <input
+							type="text"
+							id="location"
+							name="location"
+							class="w-full p-3 border border-gray-300 rounded-lg"
+							placeholder="Incident location"
+						/> -->
+						<!-- <button type="button" id="useMyLocation" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 mt-2 rounded-lg">Use My Location</button> -->
+							<select
+								class="address w-80 p-2 pl-10 border-2 border-t-0 border-l-0 border-r-0 outline-none mt-7 mb-3"
+								name="location"
+								id="location"
+								placeholder="Location"
+							></select>
+					</div>
+
+					<div class="mb-6">
+						<label
+							class="block text-gray-700 font-semibold mb-2"
+							for="imageUpload"
+							>Upload Image</label
+						>
+						<input
+							type="file"
+							id="imageUpload"
+							name="imageUpload"
+							class="w-full p-3 border border-gray-300 rounded-lg text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+							accept="image/*"
+						/>
+						<img
+							class="mt-4"
+							id="imagePreview"
+							src=""
+							alt="Preview of uploaded image"
+						/>
+					</div>
+
+					<div class="text-center">
+						<button
+							type="submit"
+							class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+						>
+							Submit Report
+						</button>
+					</div>
+				</form>
+
+			<div class="text-center mt-4">
+				<a href="/" class="text-red-500 underline mt-4">Back to Home</a>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<%- include('includes/footer') %>
+		<!-- Footer End -->
+		<script>
+			document
+				.getElementById("imageUpload")
+				.addEventListener("change", function (event) {
+					const file = event.target.files[0];
+					const reader = new FileReader();
+
+					reader.onload = function (e) {
+						const imagePreview = document.getElementById("imagePreview");
+						imagePreview.src = e.target.result;
+						imagePreview.style.display = "block";
+					};
+
+					if (file) {
+						reader.readAsDataURL(file);
+					}
+				});
+
+			document.getElementById("incidentform").addEventListener("submit", function(event) {
+				const description = document.getElementById("description").value;
+				const incidentDate = document.getElementById("incidentDate").value;
+				const location = document.getElementById("location").value;
+
+				if (!description || !incidentDate || !location) {
+					alert("Please fill out all required fields.");
+					event.preventDefault(); // Prevent form submission
+				}
+			});
+
+		const form = document.getElementById('incidentform');
+		const incidentDateInput = document.getElementById('incidentDate');
+
+		form.addEventListener('submit', (e) => {
+			const selectedDate = new Date(incidentDateInput.value);
+			const currentDate = new Date();
+
+			// Check if the selected date is in the future
+			if (selectedDate > currentDate) {
+				e.preventDefault(); // Prevent form submission
+				alert('Incident date and time cannot be in the future.');
+			}
+		});
+
+		</script>
+		<script src="../scripts/location.js" defer></script>
+	</body>
+</html>

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HubWatch - Help Keep Your Neighborhood Safe</title>
+		<link rel="stylesheet" href="css/styles.css" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="../scripts/analytics.js" defer></script>
+
+
+		
+		<% if(user && isRegistered) {%>
+			<script src="../scripts/chat.js" defer></script>
+			<script src="../scripts/home.js" defer></script>
+		<%}%>
+
+		<style>
+			#notification-icon {
+				z-index: 50; /* Keeps the icon on top */
+			}
+
+			#notification-list {
+				z-index: 40; /* Lower than the icon */
+			}
+
+			
+			#map {
+				width: 100%;
+				height: 24rem;
+				z-index: 10;
+			}
+
+
+		</style>
+
+		<!-- Font Awesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+
+	<body class="bg-gray-100 text-gray-900 relative">
+		<div
+			class="chat-container show bg-black bg-opacity-100 absolute top-0 left-0 bottom-0 right-0 hidden"
+		>
+		</div>
+
+		<div class="home-page-container">
+			<!-- Header -->
+			<%- include('includes/header') %>
+			<!-- Header Ends  -->
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>HubWatch - Help Keep Your Neighborhood Safe</title>
+	<link rel="stylesheet" href="css/styles.css" />
+	<script src="../scripts/home.js" defer></script>
+
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body class="bg-gray-100 text-gray-900 relative">
+
+			<% if (user && hasAlerted) { %>
+			<div id="notification-icon" class=" fixed top-20 left-5 bg-red-500 text-white p-2 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
+			🛎
+			<span id="notification-count" class="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs font-bold px-1"><%= notificationCount %></span>
+			</div>
+			<% } %>
+			<!-- Notification List -->
+			<div id="notification-list" class="hidden fixed top-20 left-5 bg-white border border-gray-300 rounded-lg shadow-lg p-4 max-h-[calc(100vh-100px)] overflow-y-auto w-80 ">
+				<h4 class="font-bold mb-2 text-lg">Reported Incidents</h4>
+				<div id="incident-list" class="grid grid-cols-1 gap-4">
+					<!-- Each incident will be inserted here -->
+				</div>
+				<button id="back-home-button" class="mt-2 bg-red-500 text-white rounded p-2 hover:bg-red-700">Back Home</button>
+			</div>
+			<!-- header end -->
+
+			<section
+				class="bg-cover bg-center h-96"
+				style="
+					background-image: url(https://media.istockphoto.com/id/502318972/photo/monrovia-pinned-on-a-map-of-africa.jpg?s=1024x1024&w=is&k=20&c=vlynKuzEY8XrgpJa7GRcp4KPPV_M5jF5uH67Tet519g=);
+				"
+			>
+				<div
+					class="bg-black bg-opacity-50 h-full flex justify-center items-center"
+				>
+					<div class="text-center text-white">
+						<h2 class="text-4xl font-bold mb-4">
+							Help Keep Your Neighborhood Safe
+						</h2>
+						<p class="text-xl mb-6">
+							Report incidents, track community safety, and stay informed with
+							VigilWatch.
+						</p>
+						<a
+							id="alert-button"
+							href="/"
+							class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg <%= hasAlerted ? 'bg-gray-600 cursor-not-allowed' : '' %>"
+							<%= hasAlerted ? 'disabled' : '' %>
+							><%= hasAlerted ? 'Disable Alert' : 'Get Alert' %> <i class="fas fa-exclamation-triangle"></i>
+						</a>
+						
+					</div>
+				</div>
+			</section>
+
+			<!-- Our Features Section  -->
+			<!-- <section class="py-16">
+				<div class="container mx-auto px-4 text-center">
+					<h2 class="text-3xl font-bold mb-12">Our Features</h2>
+					<div class="grid md:grid-cols-3 gap-8">
+						<div class="bg-white p-6 shadow-lg rounded-lg">
+							<h3 class="text-xl font-semibold mb-4">
+								The Effectiveness of Restorative Justice Programs
+							</h3>
+							<img
+								src="https://media.istockphoto.com/id/1470210460/photo/justice.jpg?s=1024x1024&w=is&k=20&c=J72OTMzk11lXhJ0zm3rDgYHkQUObkXI0bVayxTn0Cfw="
+								alt=""
+								srcset=""
+							/>
+							<p>
+								Crime refers to activities that violate the laws established by
+								a governing authority and are punishable by legal sanctions.
+							</p>
+						</div>
+
+						<div class="bg-white p-6 shadow-lg rounded-lg">
+							<h3 class="text-xl font-semibold mb-4">
+								The Role of Technology in Crime Prevention
+							</h3>
+							<img
+								src="https://media.istockphoto.com/id/474088166/photo/police-officer-pulled-over-driver-for-traffic-violation.jpg?s=1024x1024&w=is&k=20&c=tSr7kh6n9JdcqNerdCQypQrUHH7SpucIUm55IzoGjRo="
+								alt=""
+								srcset=""
+							/>
+							<p>
+								Crime is defined as an act that breaches established laws and
+								regulations, leading to legal consequences for the offender.
+							</p>
+						</div>
+
+						<div class="bg-white p-6 shadow-lg rounded-lg">
+							<h3 class="text-xl font-semibold mb-4">
+								The Impact of Community Policing on Crime Reduction
+							</h3>
+							<img
+								src="https://media.istockphoto.com/id/1166697314/photo/detective-board-with-photos-of-suspected-criminals-crime-scenes-and-evidence-with-red-threads.jpg?s=1024x1024&w=is&k=20&c=-3Q0nUuutEZCshSat30OzeEK-DtrypqJHN2Ze1tX0nM="
+								alt=""
+								srcset=""
+							/>
+							<p>
+								he repercussions of crime are far-reaching, impacting not only
+								the direct victims but also the broader community by fostering
+								fear and instability.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section> -->
+
+			<!-- Map View -->
+			
+				<div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+					<h2 class="text-xl font-bold mb-4">Map View</h2>
+					<div id="map" class="w-full h-96"></div>
+				</div>
+
+			<!-- News Report -->
+			<div class="latest-news-wrapper mt-4 ml-10">
+				<section class="flex flex-col md:flex-row">
+					<div class="report-crime items-center bg-white w-full mr-5 rounded-xl mb-2 shadow-lg p-1">
+						<h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Latest Reported Crimes</h1>
+						<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+							<!-- Loop through each news item -->
+							<% latestNewsFetched.forEach(newsFetch => { %>
+								<div class="card border border-[#fcfcfc]">
+									<!-- News Card -->
+									<div class="bg-white rounded-lg shadow-md overflow-hidden">
+										<h1 class="font-semibold text-2xl"><%=newsFetch.incident_type%></h1>
+										<img class="w-full h-32 object-cover" src="<%= newsFetch.image_path %>" alt="News Image" />
+					
+										<div class="p-3">
+											<div class="flex justify-between items-center">
+												<h2 class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+													<%= newsFetch.content %>
+												</h2>
+												<p class="text-xs text-gray-500">
+													<%= new Date(newsFetch.created_at).toLocaleDateString() %>
+												</p>
+											</div>
+
+											<div class="flex items-center">
+												<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+													<path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
+													<path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+												  </svg>
+												
+												<p class="text-gray-600 text-sm ml-4">
+													<%= newsFetch.location %>
+												</p>
+
+											</div>
+
+										</div>
+									</div>
+								</div>
+							<% }) %>
+						</article>
+					</div>
+
+				</section>
+
+			</div>
+
+			
+
+
+			<!-- Analytics -->
+			<section class="mb-10">
+				<header class="text-black p-4 text-center font-bold text-xl mt-10">
+					Incident Analytics
+				</header>
+
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<h2 class="text-xl font-bold mb-4">
+							Number of Incidents per Location
+						</h2>
+						<canvas id="incidentsPerLocationChart"></canvas>
+					</div>
+	
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<h2 class="text-xl font-bold mb-4">
+							Specific Incidents per Location
+						</h2>
+						<canvas id="specificIncidentsPerLocationChart"></canvas>
+					</div>
+				</div>
+			</section>
+
+			<!-- Chat Icon -->
+			<%- include('includes/chatIcon')%>
+			<!-- chat Icon End -->
+
+			<!-- Footer -->
+			<%- include('includes/footer')%>
+			<!-- Footer End -->
+		</div>
+
+		<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+		<script>
+
+			// getting the backend code to be use in the script
+			const crimesReport = <%- JSON.stringify(crimes) %>;
+						
+		
+						// creating the map instance or map for the view
+						const map = L.map('map').setView([6.290743, -10.760524], 10);
+						
+						L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+							maxZoom: 19,
+						}).addTo(map);
+		
+						if(Array.isArray(crimesReport)) {
+							
+							for (let i = 0; i < crimesReport.length; i++) {
+								const element = crimesReport[i];
+
+								
+								
+								element.map(location=>{
+								   console.log(location);
+								   const popupContent = `
+										<div class="popup-content">
+											<strong>${location.incident_type}</strong><br>
+											<img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 60px">
+											<strong>${location.location}</strong><br>
+											<a href="/news/${location.id}">More information</a><br>
+											
+										</div>
+									`;
+								   const marker = L.marker([location.location_lat, location.location_lng]).addTo(map).bindPopup(popupContent).openPopup();
+							   })
+								
+							}
+
+                       }
+	
+			document.getElementById('alert-button').addEventListener('click', function() {
+				const isAlerted = this.textContent.includes('Disable Alert');
+
+				// Update button text and style
+				if (isAlerted) {
+					this.textContent = 'Get Alert';
+					this.classList.remove('bg-gray-600');
+					this.classList.add('bg-red-600');
+					this.classList.add('hover:bg-red-700');
+					this.classList.remove('cursor-not-allowed');
+					// Send request to backend to disable alert
+					fetch('/disable-alert', { method: 'POST' });
+				} else {
+					this.textContent = 'Disable Alert';
+					this.classList.remove('hover:bg-red-700');
+					this.classList.add('bg-gray-600');
+					this.classList.add('cursor-not-allowed');
+					// Send request to backend to enable alert
+					fetch('/set-alert', { method: 'POST' });
+				}
+
+				// Toggle notification icon based on alert status
+				const notificationIcon = document.getElementById('notification-icon');
+				notificationIcon.style.pointerEvents = isAlerted ? 'none' : 'auto';
+			});
+
+					// Handle notification icon click
+		document.getElementById('notification-icon').addEventListener('click', function() {
+			const notificationList = document.getElementById('notification-list');
+			notificationList.classList.toggle('hidden');
+
+			if (!notificationList.classList.contains('hidden')) {
+				fetch('/get-reported-incidents')
+					.then(response => response.json())
+					.then(data => {
+						const incidentList = document.getElementById('incident-list');
+						incidentList.innerHTML = ''; // Clear existing items
+						data.incidents.forEach(incident => {
+							const card = document.createElement('div');
+							card.className = 'bg-white border border-gray-200 rounded-lg shadow-md p-4 flex flex-col';
+
+							const img = document.createElement('img');
+							img.src = incident.image_path || 'https://via.placeholder.com/150'; // Default image if none provided
+							img.alt = 'Incident Image';
+							img.className = 'w-full h-32 object-cover rounded-lg mb-2';
+
+							const info = document.createElement('div');
+							info.className = 'flex flex-col justify-between';
+
+							const location = document.createElement('h5');
+							location.className = 'text-lg font-semibold mb-1';
+							location.textContent = `Location: ${incident.location}`;
+
+							const description = document.createElement('p');
+							description.className = 'text-gray-700 mb-1';
+							description.textContent = `Description: ${incident.description}`;
+
+							const type = document.createElement('p');
+							type.className = 'text-gray-700 mb-1';
+							type.textContent = `Incident Type: ${incident.incident_type}`;
+
+							const date = document.createElement('p');
+							date.className = 'text-gray-700';
+							const formattedDate = new Date(incident.incident_date); 
+							const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+							const formattedDateTime = formattedDate.toLocaleDateString('en-US', options); 
+							date.textContent =` Date: ${formattedDateTime}`;
+
+							info.append(location, description, type, date);
+							card.append(img, info);
+							incidentList.appendChild(card);
+						});
+
+						// Reset the notification count when viewing incidents
+						document.getElementById('notification-count').textContent = '0';
+					});
+			}
+		});
+
+
+			// Back Home Button functionality to take us back to home
+			document.getElementById('back-home-button').addEventListener('click', function() {
+				const notificationList = document.getElementById('notification-list');
+				notificationList.classList.add('hidden');
+			});
+
+		</script>
+	</body>
+</html>

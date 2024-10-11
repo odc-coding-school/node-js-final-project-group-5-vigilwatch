@@ -1,0 +1,205 @@
+    
+<link rel="stylesheet" href="/css/extra-style.css">
+
+
+<header class="bg-red-700 py-6 shadow-md fixed right-0 left-0 top-0 z-50">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-white hover:cursor-pointer"><a href="/">CrimeNet</a></h1>
+
+
+        <nav class="flex items-center justify-between">
+            <ul class="space-x-6 text-white items-center hidden md:flex">
+                <li><a href="/" class="hover:underline">Home</a></li>
+                <li><a href="/report" class="hover:underline">Report Incident</a></li>
+                <li><a href="/map" class="hover:underline">Map View</a></li>
+                <li><a href="/analytics" class="hover:underline">Analytics</a></li>
+                <li><a href="/news" class="hover:underline">News</a></li>
+                <% if(isRegistered) { %>
+                    <!-- <li><a href="/logout" class="hover:underline">Logout</a></li> -->
+                <% } else {%>
+                    <li><a href="/login" class="hover:underline">Login</a></li>
+                <% }%>
+
+            </ul>
+
+
+            <div class="toggleHeader flex items-center justify-center">
+                <% if (isRegistered) { %>
+                    <li class="relative list-none ml-5">
+
+                        <button id="profile-menu-btn" class="flex items-center focus:outline-none">
+                            <img src="<%= user.profilePic ? user.profilePic : '/user-solid.svg' %>"
+                                alt="Profile" class="w-10 h-10 rounded-full border-4 border-gray-500">
+                        </button>
+
+                        <div id="profile-menu"
+                            class="absolute right-0 mt-2 w-52 bg-red-600 rounded-lg shadow-lg hidden z-20">
+                            <h1 class="px-4 py-2 text-white">Welcome <%= user && user.full_name %>
+                            </h1>
+                            <ul class="py-1 flex flex-col">
+                                <li>
+                                    
+                                    <form action="/user/upload-profile" method="POST" enctype="multipart/form-data"
+                                        class="px-4 py-2">
+                                        <input type="file" name="profilePic" accept="image/*"
+                                            class="mb-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
+                                        <button type="submit"
+                                            class="block w-full text-cente text-white bg-red-700 hover:bg-red-800">Upload
+                                            Profile</button>
+                                    </form>
+
+
+
+                                    <% if (user && user.role === 1) { %>
+                                    <li class="w-full"><button class="block w-full text-center text-white bg-red-700 hover:bg-red-800"><a href="/admin-dashboard">Admin Panel</a></button></li>
+                                    <% } %>
+                                    <br>
+
+                                    <% if (user && user.role === 0) { %>
+                                    <li class="w-full"><button class="block w-full text-center text-white bg-red-700 hover:bg-red-800"><a href="/user/profile">Profile</a></button></li>
+                                    <% } %>
+                                </li>
+                                <li class="w-full">
+                                    <form action="/logout" method="POST" class="block w-full px-4 py-2">
+                                        <button type="submit"
+                                            class=" block w-full text-center text-white bg-red-700 hover:bg-red-800">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <% }%>
+
+
+
+                <div class="menu md:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="menu-icon"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+
+
+        </nav>
+    </div>
+</header>
+
+
+<!-- --=================toggle navbar links=================== -->
+<div class="toogle-container bg-red-600 md:hidden">
+
+    <div class="close-btn text-white ml-8 mt-5 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-backspace"
+            viewBox="0 0 16 16">
+            <path
+                d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z" />
+            <path
+                d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
+        </svg>
+    </div>
+
+    <ul class="space-x-6 text-white flex flex-col text-2xl">
+
+
+        <a href="/" class="w-full home">
+            <div class="navbar-link">
+                <li>Home</li>
+            </div>
+        </a>
+
+        <a href="/report" class="report-incident w-full">
+            <div class="navbar-link">
+                <li>Report Incident</li>
+            </div>
+        </a>
+
+        <a href="/map" class="report-incident w-full">
+            <div class="navbar-link">
+                <li>Map View</li>
+            </div>
+        </a>
+
+        <a href="/analytics" class="analytics w-full">
+            <div class="navbar-link">
+                <li>Analytics</li>
+            </div>
+        </a>
+
+        <a href="/news" class="news w-full">
+            <div class="navbar-link">
+                <li>News</li>
+            </div>
+        </a>
+
+        <%if(isRegistered) {%>
+            <form action="/logout" method="POST" class="block px-4 py-2 w-full">
+                <div class="navbar-link">
+                    <button type="submit" class="w-full text-white text-center">Logout</button>
+                </div>
+
+            </form>
+
+            <%} else {%>
+                <a href="/login" class="w-full">
+                    <div class="navbar-link">
+                        <li>Login</li>
+                    </div>
+                </a>
+                <%}%>
+    </ul>
+
+</div>
+
+
+</div>
+
+
+<% if(isRegistered) {%>
+    <script>
+        document.getElementById('profile-menu-btn').addEventListener('click', function () {
+            const profileMenu = document.getElementById('profile-menu');
+            profileMenu.classList.toggle('hidden');
+        });
+
+
+        document.addEventListener('click', function (e) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileBtn = document.getElementById('profile-menu-btn');
+            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        
+
+    </script>
+    <%}%>
+
+
+
+        <!-- script alway in use if user don't log in  -->
+        <script>
+            const menuIcon = document.querySelector('.menu');
+            const toogleContainer = document.querySelector('.toogle-container');
+            const closeIcon = document.querySelector('.close-btn');
+
+            //showing the menu navbar
+            menuIcon.addEventListener('click', () => {
+                toogleContainer.classList.add("show");
+                menuIcon.style.opacity = "0";
+
+            });
+
+            //closing the menu navbar
+            closeIcon.addEventListener('click', () => {
+                toogleContainer.classList.remove("show");
+                menuIcon.style.opacity = "1";
+
+            });
+
+
+
+        </script>

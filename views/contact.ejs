@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Contact Us - CrimeNet</title>
+
+		<link rel="stylesheet" href="css/styles.css" />
+	</head>
+	<body class="bg-gray-100 min-h-screen flex flex-col">
+		<!-- Header -->
+		<%- include('includes/header') %>
+		<!-- header end -->
+		<header class="py-4">
+			<div class="container mx-auto px-4">
+				<h1 class="text-black text-3xl font-bold text-center">Contact Us</h1>
+			</div>
+		</header>
+
+		<main class="flex-grow">
+			<div class="container mx-auto px-4 py-12">
+				<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+					<h2 class="text-2xl font-bold text-center mb-8">
+						We'd love to hear from you!
+					</h2>
+					<p class="text-gray-700 text-center mb-4">
+						If you have any questions or need assistance, feel free to reach out
+						to us using the form below or via email at
+						<a
+							href="mailto:hubwatch231@gmail.com"
+							class="text-blue-600 hover:underline"
+							>hubwatch231@gmail.com</a
+						>.
+					</p>
+
+					<form action="/send-message" method="POST">
+						<div class="mb-4">
+							<label for="name" class="block text-gray-700">Your Name</label>
+							<input
+								type="text"
+								id="name"
+								name="name"
+								class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+								required
+							/>
+						</div>
+
+						<div class="mb-4">
+							<label for="email" class="block text-gray-700">Your Email</label>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+								required
+							/>
+						</div>
+
+						<div class="mb-4">
+							<label for="message" class="block text-gray-700"
+								>Your Message</label
+							>
+							<textarea
+								id="message"
+								name="message"
+								class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+								rows="6"
+								required
+							></textarea>
+						</div>
+
+						<button
+							type="submit"
+							class="w-full bg-red-700 text-white py-3 rounded-lg font-bold hover:bg-red-400"
+						>
+							Send Message
+						</button>
+					</form>
+				</div>
+			</div>
+		</main>
+
+		<!-- Footer -->
+		<%- include('includes/footer') %>
+		<!-- Footer End -->
+	</body>
+</html>

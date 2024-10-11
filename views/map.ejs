@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hubwatch Map Vies</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="/css/map.css">
+    <script src="/scripts/map.js" defer></script>
+
+
+    <style>
+        .suggested-area {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+            margin-inline: auto;
+            z-index: 100;
+            opacity: 0;
+        }
+
+
+			#map {
+				width: 100%;
+				height: 24rem;
+				z-index: 10;
+			}
+
+			.searchbar-wrapper {
+				z-index: 100;
+			}
+
+    </style>
+</head>
+
+	<body>
+		<!--  -->
+
+		<%- include('includes/header') %>
+
+        <main class="mt-24 ">
+            <!-- search bar -->
+            <section class="searchbar-wrapper border w-4/5 rounded-sm flex items-center fixed sm:w-full mt-10 mx-8
+            lg:w-[40%] lg:left-[30%] bg-white p-2" >
+
+                <div class="flex-1 flex h-full w-full items-center" id="searchForm">
+                    <!-- <button class="filter-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                          </svg>
+                    </button>
+
+                    <div class="filter"></div> -->
+
+                    <input type="text" placeholder="Search Crime Area" class="w-full h-full p-2 outline-none"
+                        name="locationFilter" id="searchbar" autocomplete="off">
+                    <button id="search-btn" class="mr-7 ml-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            class="bi bi-search" viewBox="0 0 16 16">
+                            <path
+                                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                        </svg>
+                    </div>
+                </form>
+
+            </section>
+
+
+            <div class="suggested-area border rounded-sm flex items-center fixed sm:w-full mt-10 mx-8
+            lg:w-[40%] lg:left-[33%] bg-white top-[25%] h-32"></div>
+
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div id="map" class="w-full h-96"></div>
+            </div>
+
+
+            <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+            <script>
+                // getting the backend code to be use in the script
+                const crimesReport = <%- JSON.stringify(crimes) %>;
+                
+                const suggestedAreaWrapper = document.querySelector('.suggested-area')
+
+                // creating the map instance or map for the view
+                const map = L.map('map').setView([6.290743, -10.760524], 10);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+                const searchBtn = document.getElementById('search-btn');
+
+                // displaying each location and crime on the map
+                crimesReport.forEach(crime => {
+                    console.log(crime);
+
+                    // Create a custom popup content
+                    const popupContent = `
+                <div class="popup-content">
+                    <strong>${crime.incident_type}</strong><br>
+                    <img src="${crime.image_path}" alt="Image Description" style="width: 100%; height: 100px">
+                    <strong>${crime.location}</strong><br>
+                    <a href="/news/${crime.id}">More information</a><br>
+                    
+                </div>
+            `;
+                    
+                    L.marker([crime.location_lat, crime.location_lng]).addTo(map).bindPopup(popupContent).openPopup();
+                })
+
+                console.log(searchBtn);
+                
+
+                // Search input functionality
+                searchBtn.addEventListener('click', function() {
+                    const searchbar = document.getElementById('searchbar');
+
+                   const query = searchbar.value;
+                    
+                    const markerGroup = L.layerGroup().addTo(map).openPopup();
+                    console.log(markerGroup);
+
+
+                    if(query.length<1) {
+                        markerGroup.clearLayers();
+                        return;
+                    }
+
+                    // Fetch the result
+                    fetch(`/search/${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        // clerar out previous markers
+                       markerGroup.clearLayers();
+                        
+                       if(Array.isArray(data)) {
+                           data.forEach(location=>{
+                               console.log(location);
+                               const popupContent = `
+                                    <div class="popup-content">
+                                        <strong>${location.incident_type}</strong><br>
+                                        <img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 100px">
+                                        <strong>${location.location}</strong><br>
+                                        <a href="/news/${location.id}">More information</a><br>
+                                        
+                                    </div>
+                                `;
+                               const marker = L.marker([location.location_lat, location.location_lng])
+
+                               .addTo(markerGroup).bindPopup(popupContent).openPopup();
+                           })
+
+
+                           if (data.length >0) {
+                            map.setView([data[0].location_lat, data[0].location_lng])
+                           
+                           }
+                       }else {
+                            suggestedAreaWrapper.innerHTML = data;
+                            suggestedAreaWrapper.style.opacity = 1
+                        }
+                    
+                    })
+                
+
+                })
+
+                
+                
+                // Applying the search feature
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchbar = document.getElementById('searchbar');
+                 
+
+                   const markerGroup = L.layerGroup().addTo(map);
+                   console.log(markerGroup);
+                   
+
+                   //searchbar Event
+                   searchbar.addEventListener('input', async()=>{
+                    const query = searchbar.value;
+
+
+                    if(query.length<1) {
+                        markerGroup.clearLayers();
+                        return;
+                    }
+
+                    // Fetch the result
+                    fetch(`/search/${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        // clerar out previous markers
+                       markerGroup.clearLayers();
+                        
+                       if(Array.isArray(data)) {
+                           data.forEach(location=>{
+                               console.log(location);
+                               
+                               const marker = L.marker([location.location_lat, location.location_lng])
+                               .addTo(markerGroup).bindPopup(location.incident_type)
+                           })
+
+
+                           if (data.length >0) {
+                            map.setView([data[0].location_lat, data[0].location_lng])
+                           }
+                       }
+                    
+                    })
+                
+                   })
+                   
+                })
+
+
+
+            </script>
+
+
+        </main>
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<title>Error Reporting Incident</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="/css/styles.css" />
+		<style>
+			body {
+				font-family: "Roboto", sans-serif;
+				background-color: #f8f9fa;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+			}
+
+			.error-container {
+				background-color: white;
+				padding: 2.5rem;
+				border-radius: 0.75rem;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				text-align: center;
+				max-width: 450px;
+				width: 100%;
+			}
+
+			.error-icon {
+				font-size: 4rem;
+				color: #ff6b6b;
+			}
+
+			.error-title {
+				font-size: 2rem;
+				font-weight: 700;
+				color: #343a40;
+				margin: 1rem 0;
+			}
+
+			.error-message {
+				font-size: 1.2rem;
+				color: #868e96;
+				margin-bottom: 1.5rem;
+			}
+
+			.retry-btn {
+				background-color: #ff6b6b;
+				color: white;
+				padding: 0.75rem 1.5rem;
+				border: none;
+				border-radius: 0.5rem;
+				font-size: 1rem;
+				cursor: pointer;
+				transition: background-color 0.3s;
+			}
+
+			.retry-btn:hover {
+				background-color: #ff8787;
+			}
+
+			.back-home-link {
+				display: inline-block;
+				margin-top: 1rem;
+				font-size: 1rem;
+				color: #343a40;
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			.back-home-link:hover {
+				color: #495057;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="error-container">
+			<div class="error-icon">⚠️</div>
+			<div class="error-title">Error Reporting Incident</div>
+			<div class="error-message">
+				An error occurred while trying to report the incident. Please try again.
+			</div>
+			<button class="retry-btn" onclick="window.location.href='/report';">
+				Retry Reporting
+			</button>
+			<a href="/" class="back-home-link">Go Back to Home</a>
+		</div>
+	</body>
+</html>
