@@ -122,11 +122,6 @@ const sendSMS = (receipient, sender, body) => {
 		});
 };
 
-// 404
-app.use((req, res) => {
-    res.status(404).render('404'); 
-});
-
 // Route to get specific news item by id
 app.get("/news/:id", async (req, res) => {
 	const user = req.session.user || null;
@@ -228,8 +223,6 @@ app.get("/admin/news/import", isAdmin, (req, res) => {
 app.get("/user/profile", registeredUsers, async (req, res) => {
 	const userId = req.session.user.id;
 	const userRole = req.session.user.role;
-	
-
 
 	try {
 		// Fetch user data
@@ -241,7 +234,6 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 			);
 
 		console.log(user);
-
 
 		// Count reported incidents
 		const [reportedIncidents] = await db
@@ -261,10 +253,9 @@ app.get("/user/profile", registeredUsers, async (req, res) => {
 
 		const latestNews = await db.promise().query(
 			`SELECT * FROM incidents join users on(users.id=incidents.userId) WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
-		`, [userId]);
-
-
-
+		`,
+			[userId]
+		);
 
 		db.query(
 			`SELECT * FROM incidents WHERE userId =?`,
@@ -317,7 +308,7 @@ app.post("/admin/promote", isAdmin, (req, res) => {
 	});
 });
 
-// ================Dashboard Render=============// 
+// ================Dashboard Render=============//
 app.get("/admin-dashboard", isAdmin, async (req, res) => {
 	const user = req.session.user || null;
 	const userId = req.session.user.id;
@@ -325,30 +316,24 @@ app.get("/admin-dashboard", isAdmin, async (req, res) => {
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
 	const countQuery = "SELECT COUNT(*) AS userCounts FROM users "; //number of the registered users
-	const importedNewsQuery= "SELECT COUNT(*) AS userCounts FROM news "; //number of the Imported News
+	const importedNewsQuery = "SELECT COUNT(*) AS userCounts FROM news "; //number of the Imported News
 
-	
 	// Count reported incidents
 	const [reportedIncidents] = await db
 		.promise()
 		.query(
 			"SELECT COUNT(*) as count FROM incidents WHERE status = 'confirmed'"
-		)
-		
-// Count pending incidents
-const [pendingIncidents] = await db
-	.promise()
-	.query(
-		"SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'"
-	);
+		);
 
-
+	// Count pending incidents
+	const [pendingIncidents] = await db
+		.promise()
+		.query("SELECT COUNT(*) as count FROM incidents WHERE status = 'pending'");
 
 	const [userCount] = await db.promise().query(countQuery);
 	const [newsCount] = await db.promise().query(importedNewsQuery);
 	console.log(reportedIncidents[0].count);
 	console.log(pendingIncidents[0].count);
-
 
 	db.query(userQuery, (err, users) => {
 		if (err) return res.status(500).send("Error retrieving users.");
@@ -357,18 +342,17 @@ const [pendingIncidents] = await db
 			if (err) return res.status(500).send("Error retrieving incidents.");
 
 			res.render("admin-dashboard", {
-				users, incidents, user,
+				users,
+				incidents,
+				user,
 				userCount: userCount[0].userCounts,
 				newsCount: newsCount[0].userCounts,
 				reportedReported: reportedIncidents[0].count,
 				pendingIncidents: pendingIncidents[0].count,
-				isRegistered: !!req.session.user
+				isRegistered: !!req.session.user,
 			});
 		});
 	});
-
-
-
 });
 
 // ================User management Render=============//
@@ -393,8 +377,8 @@ app.get("/user-management", isAdmin, (req, res) => {
 	});
 });
 
-// ================Incidents management Render=============// 
-app.get("/incidents", isAdmin, async(req, res) => {
+// ================Incidents management Render=============//
+app.get("/incidents", isAdmin, async (req, res) => {
 	const user = req.session.user || null;
 	const userQuery = "SELECT id, full_name, email, role FROM users"; // All users
 	const incidentQuery = "SELECT * FROM incidents"; // All incidents
@@ -402,9 +386,7 @@ app.get("/incidents", isAdmin, async(req, res) => {
 
 	const [userCount] = await db.promise().query(countQuery);
 
-
 	console.log(userCount[0].incidentCount);
-
 
 	db.query(userQuery, (err, users) => {
 		if (err) return res.status(500).send("Error retrieving users.");
@@ -496,8 +478,6 @@ app.post("/update-location", (req, res) => {
 
 	const userQuery = `UPDATE users SET user_address =?  WHERE id = ?`;
 	db.query(userQuery, [address, user.id], (err, result) => {
-
-
 		console.log(result);
 
 		req.session.user.user_address = address;
@@ -637,9 +617,8 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/verify-number", registeredUsers, (req, res) => {
-	res.render('verify-number')
-})
-
+	res.render("verify-number");
+});
 
 const regex = /^[\d+]+$/;
 const countryCode = "+231";
@@ -656,8 +635,6 @@ app.post("/register", async (req, res) => {
 	const formatedPhoneNumber = `${countryCode}${splicePhoneNumber}`;
 
 	console.log(formatedPhoneNumber);
-
-
 
 	try {
 		//checke if email exist in the user table
@@ -793,10 +770,14 @@ app.post("/login", async (req, res) => {
 
 				if (result.length === 0) {
 					// registeredNumber
-					res.render('login', { error: "Phone number is not registered." })
-					req.session.user = null
+					res.render("login", { error: "Phone number is not registered." });
+					req.session.user = null;
 				} else {
-					sendSMS(formatedPhoneNumber, process.env.VERIFIED_PHONE, `Your VigilWatch Verification Code is ${result[0].otp_number}`);
+					sendSMS(
+						formatedPhoneNumber,
+						process.env.VERIFIED_PHONE,
+						`Your VigilWatch Verification Code is ${result[0].otp_number}`
+					);
 					res.status(200).render("verify-number");
 				}
 			}
@@ -865,8 +846,10 @@ app.post("/verify-number", (req, res) => {
 			} else {
 				req.session.user = null;
 				console.log(req.session.user);
-				
-				res.render('verify-number', { error: 'The code you entered is invalid' })
+
+				res.render("verify-number", {
+					error: "The code you entered is invalid",
+				});
 			}
 		}
 	);
@@ -932,10 +915,8 @@ app.post("/logout", (req, res) => {
 	});
 });
 
-
 app.get("/search/:query", (req, res) => {
 	const param = req.params.query;
-
 
 	console.log(param);
 
@@ -945,12 +926,10 @@ app.get("/search/:query", (req, res) => {
 	db.query(query, [`%${param}%`], (err, result) => {
 		if (err) return res.json(err.message);
 
-		if (result.length === 0) return res.json('No result found')
+		if (result.length === 0) return res.json("No result found");
 		return res.json(result);
-	})
-})
-
-
+	});
+});
 
 const server = app.listen(PORT, () => {
 	console.log(`Server running on http://localhost:${PORT}`);
@@ -965,6 +944,12 @@ app.get("/chat", (req, res) => {
 
 	const user = req.session.user || null;
 	res.render("chat", { user, isRegistered: !!req.session.user });
+});
+
+// 404
+// 404
+app.use((req, res) => {
+	res.status(404).render("404");
 });
 
 // Handle socket connection inside the chat route

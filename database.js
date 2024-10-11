@@ -11,7 +11,7 @@ const db = mysql2.createConnection({
 db.connect(function (err) {
 	if (err) return console.log(err.message);
 	db.query(
-		`CREATE DATABASE IF NOT EXISTS heroku_d09a6cc7caa0500`,
+		`CREATE DATABASE IF NOT EXISTS heroku_8e11373d77d8d6f`,
 		function (err) {
 			if (err) return console.log(err.message);
 			return console.log("database is created successfully");
@@ -78,7 +78,7 @@ const createTables = () => {
             id INT AUTO_INCREMENT PRIMARY KEY,
             title TEXT NOT NULL,
             image VARCHAR(255) NOT NULL,
-            content VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
             location VARCHAR(55) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
