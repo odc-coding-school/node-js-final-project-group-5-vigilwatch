@@ -122,6 +122,11 @@ const sendSMS = (receipient, sender, body) => {
 		});
 };
 
+// 404
+app.use((req, res) => {
+    res.status(404).render('404'); 
+});
+
 // Route to get specific news item by id
 app.get("/news/:id", async (req, res) => {
 	const user = req.session.user || null;

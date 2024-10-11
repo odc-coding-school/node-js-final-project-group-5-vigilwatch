@@ -37,7 +37,7 @@ router.post(
 			res.redirect("/news", {isRegistered: !!req.session.user});
 		} catch (error) {
 			console.error(error);
-			res.status(500).send("Server Error");
+			res.status(500).render("newsServerError");
 		}
 	}
 );

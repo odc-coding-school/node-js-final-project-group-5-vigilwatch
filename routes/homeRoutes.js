@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 
-router.get("/", async(req, res) => {
+router.get("/", async (req, res) => {
 	const notificationCount = req.session.notificationCount || 0; // Get notification count from session
 	req.session.notificationCount = 0; // Reset notification count
 	const hasAlerted = req.session.hasAlerted || false;
@@ -10,12 +10,17 @@ router.get("/", async(req, res) => {
 	// Latest news
 	const newsId = req.params.id;
 	const latestNews = await db.promise().query(
-		`SELECT * FROM incidents WHERE created_at >= now() - INTERVAL 3 DAY ORDER BY created_at DESC LIMIT 4;
-	`);
+		`SELECT * FROM incidents WHERE created_at >= now() - INTERVAL 3 DAY AND status = "confirmed" ORDER BY created_at DESC LIMIT 4;
+	`
+	);
 
-    const [news] = await db.promise().query("SELECT * FROM news WHERE id = ?", [newsId]);
-	
-	const homeMap = await db.promise().query(`SELECT * FROM incidents WHERE status = "confirmed"`);
+	const [news] = await db
+		.promise()
+		.query("SELECT * FROM news WHERE id = ?", [newsId]);
+
+	const homeMap = await db
+		.promise()
+		.query(`SELECT * FROM incidents WHERE status = "confirmed"`);
 
 	const user = req.session.user || null;
 	res.render("home", {
@@ -24,9 +29,8 @@ router.get("/", async(req, res) => {
 		notificationCount,
 		hasAlerted,
 		latestNewsFetched: latestNews[0],
-		crimes: homeMap, 
-		isRegistered: !!req.session.user
-
+		crimes: homeMap,
+		isRegistered: !!req.session.user,
 	});
 });
 

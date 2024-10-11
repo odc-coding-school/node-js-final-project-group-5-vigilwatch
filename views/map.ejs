@@ -171,51 +171,51 @@
                 
                 
                 // Applying the search feature
-                // document.addEventListener('DOMContentLoaded', function() {
-                //     const searchbar = document.getElementById('searchbar');
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchbar = document.getElementById('searchbar');
                  
 
-                //    const markerGroup = L.layerGroup().addTo(map);
-                //    console.log(markerGroup);
+                   const markerGroup = L.layerGroup().addTo(map);
+                   console.log(markerGroup);
                    
 
-                //    //searchbar Event
-                //    searchbar.addEventListener('input', async()=>{
-                //     const query = searchbar.value;
+                   //searchbar Event
+                   searchbar.addEventListener('input', async()=>{
+                    const query = searchbar.value;
 
 
-                //     if(query.length<1) {
-                //         markerGroup.clearLayers();
-                //         return;
-                //     }
+                    if(query.length<1) {
+                        markerGroup.clearLayers();
+                        return;
+                    }
 
-                //     // Fetch the result
-                //     fetch(`/search/${query}`)
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         console.log(data);
-                //         // clerar out previous markers
-                //        markerGroup.clearLayers();
+                    // Fetch the result
+                    fetch(`/search/${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        // clerar out previous markers
+                       markerGroup.clearLayers();
                         
-                //        if(Array.isArray(data)) {
-                //            data.forEach(location=>{
-                //                console.log(location);
+                       if(Array.isArray(data)) {
+                           data.forEach(location=>{
+                               console.log(location);
                                
-                //                const marker = L.marker([location.location_lat, location.location_lng])
-                //                .addTo(markerGroup).bindPopup(location.incident_type)
-                //            })
+                               const marker = L.marker([location.location_lat, location.location_lng])
+                               .addTo(markerGroup).bindPopup(location.incident_type)
+                           })
 
 
-                //            if (data.length >0) {
-                //             map.setView([data[0].location_lat, data[0].location_lng])
-                //            }
-                //        }
+                           if (data.length >0) {
+                            map.setView([data[0].location_lat, data[0].location_lng])
+                           }
+                       }
                     
-                //     })
+                    })
                 
-                //    })
+                   })
                    
-                // })
+                })
 
 
 

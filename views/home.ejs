@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>CrimeNet - Help Keep Your Neighborhood Safe</title>
+		<title>HubWatch - Help Keep Your Neighborhood Safe</title>
 		<link rel="stylesheet" href="css/styles.css" />
 		<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -55,7 +55,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CrimeNet - Help Keep Your Neighborhood Safe</title>
+	<title>HubWatch - Help Keep Your Neighborhood Safe</title>
 	<link rel="stylesheet" href="css/styles.css" />
 	<script src="../scripts/home.js" defer></script>
 
@@ -68,7 +68,7 @@
 
 			<% if (user && hasAlerted) { %>
 			<div id="notification-icon" class=" fixed top-20 left-5 bg-red-500 text-white p-2 rounded-full shadow-lg cursor-pointer transition-transform transform hover:scale-105">
-			🛎️
+			🛎
 			<span id="notification-count" class="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs font-bold px-1"><%= notificationCount %></span>
 			</div>
 			<% } %>
@@ -165,23 +165,69 @@
 				</div>
 			</section> -->
 
-
-
-
 			<!-- Map View -->
-			<main class="mt-24 ">
-				
-				<div class="bg-white p-6 rounded-lg shadow-lg">
+			
+				<div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+					<h2 class="text-xl font-bold mb-4">Map View</h2>
 					<div id="map" class="w-full h-96"></div>
 				</div>
-			</main>
+
+			<!-- News Report -->
+			<div class="latest-news-wrapper mt-4 ml-10">
+				<section class="flex flex-col md:flex-row">
+					<div class="report-crime items-center bg-white w-full mr-5 rounded-xl mb-2 shadow-lg p-1">
+						<h1 class="font-semibold md:font-bold text-sm md:text-lg mb-4 ">Latest Reported Crimes</h1>
+						<article class="hwb-news mt-4 mb-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+							<!-- Loop through each news item -->
+							<% latestNewsFetched.forEach(newsFetch => { %>
+								<div class="card border border-[#fcfcfc]">
+									<!-- News Card -->
+									<div class="bg-white rounded-lg shadow-md overflow-hidden">
+										<h1 class="font-semibold text-2xl"><%=newsFetch.incident_type%></h1>
+										<img class="w-full h-32 object-cover" src="<%= newsFetch.image_path %>" alt="News Image" />
+					
+										<div class="p-3">
+											<div class="flex justify-between items-center">
+												<h2 class="text-lg font-semibold max-w-64 overflow-hidden whitespace-nowrap text-ellipsis">
+													<%= newsFetch.content %>
+												</h2>
+												<p class="text-xs text-gray-500">
+													<%= new Date(newsFetch.created_at).toLocaleDateString() %>
+												</p>
+											</div>
+
+											<div class="flex items-center">
+												<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+													<path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
+													<path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+												  </svg>
+												
+												<p class="text-gray-600 text-sm ml-4">
+													<%= newsFetch.location %>
+												</p>
+
+											</div>
+
+										</div>
+									</div>
+								</div>
+							<% }) %>
+						</article>
+					</div>
+
+				</section>
+
+			</div>
+
+			
 
 
 			<!-- Analytics -->
-			<section class="">
-				<header class="text-black p-4 text-center font-bold text-xl mt-32">
-					 	Incident Analytics
+			<section class="mb-10">
+				<header class="text-black p-4 text-center font-bold text-xl mt-10">
+					Incident Analytics
 				</header>
+
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 					<div class="bg-white p-6 rounded-lg shadow-lg">
 						<h2 class="text-xl font-bold mb-4">
@@ -235,13 +281,13 @@
 								   const popupContent = `
 										<div class="popup-content">
 											<strong>${location.incident_type}</strong><br>
-											<img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 100px">
+											<img src="${location.image_path}" alt="Image Description" style="width: 100%; height: 60px">
 											<strong>${location.location}</strong><br>
 											<a href="/news/${location.id}">More information</a><br>
 											
 										</div>
 									`;
-								   const marker = L.marker([location.location_lat, location.location_lng]).addTo(markerGroup).bindPopup(popupContent).openPopup();
+								   const marker = L.marker([location.location_lat, location.location_lng]).addTo(map).bindPopup(popupContent).openPopup();
 							   })
 								
 							}
@@ -314,7 +360,7 @@
 							const formattedDate = new Date(incident.incident_date); 
 							const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
 							const formattedDateTime = formattedDate.toLocaleDateString('en-US', options); 
-							date.textContent = `Date: ${formattedDateTime}`;
+							date.textContent =` Date: ${formattedDateTime}`;
 
 							info.append(location, description, type, date);
 							card.append(img, info);

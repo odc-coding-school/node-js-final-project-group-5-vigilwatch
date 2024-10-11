@@ -10,10 +10,13 @@ const db = mysql2.createConnection({
 
 db.connect(function (err) {
 	if (err) return console.log(err.message);
-	db.query(`CREATE DATABASE IF NOT EXISTS hubwatch_database`, function (err) {
-		if (err) return console.log(err.message);
-		return console.log("database is created successfully");
-	});
+	db.query(
+		`CREATE DATABASE IF NOT EXISTS heroku_d09a6cc7caa0500`,
+		function (err) {
+			if (err) return console.log(err.message);
+			return console.log("database is created successfully");
+		}
+	);
 	console.log("database connected");
 });
 
@@ -26,7 +29,7 @@ const createTables = () => {
             user_address VARCHAR(255),
 			phone_number VARCHAR(13) NOT NULL UNIQUE,
 			otp_number VARCHAR(6),
-			otp_expiry DATETIMEE,
+			otp_expiry DATETIME,
 			token VARCHAR(255),
             room_id INT,
             profilePic VARCHAR(255),
@@ -38,7 +41,7 @@ const createTables = () => {
 
 	db.query(createUsersTable, (error, result) => {
 		if (error) {
-			console.log("error creating users table");
+			console.log("error creating users table", error);
 		} else {
 			console.log("Users table created or already exists");
 		}
@@ -178,13 +181,13 @@ const createTables = () => {
 		}
 	});
 
-	// db.query(`ALTER TABLE users DROP COLUMN password `, (err, result) => {
-	// 	if (err) {
-	// 		console.log("Error altering incidents table:", err.message);
-	// 	} else {
-	// 		console.log("link drop");
-	// 	}
-	// });
+	db.query(`ALTER TABLE users DROP COLUMN password `, (err, result) => {
+		if (err) {
+			console.log("Error altering incidents table:", err.message);
+		} else {
+			console.log("link drop");
+		}
+	});
 
 	db.query(
 		`ALTER TABLE users ADD COLUMN role INT DEFAULT 0;`,
